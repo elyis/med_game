@@ -1,4 +1,5 @@
-﻿using med_game.src.Models;
+﻿using med_game.src.Entities;
+using med_game.src.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,5 +19,17 @@ namespace med_game.Models
         public string? Image { get; set; }
 
         public List<User> Users { get; set; } = new();
+
+        public AchievementBody ToAchievementBody()
+        {
+            return new AchievementBody
+            {
+                Name = Name,
+                Description = Description,
+                CountPoints = CountPoints,
+                MaxCountPoints = MaxCountPoints,
+                UrlIcon = Image,
+            };
+        }
     }
 }

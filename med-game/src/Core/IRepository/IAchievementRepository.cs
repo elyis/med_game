@@ -1,5 +1,5 @@
 ﻿using med_game.Models;
-using med_game.src.Entities.Request;
+using med_game.src.Entities;
 
 namespace med_game.src.Core.IRepository
 {
@@ -10,6 +10,8 @@ namespace med_game.src.Core.IRepository
         Task<Achievement?> AddAsync(AchievementBody achievementBody);
         Task<bool> RemoveAsync(int id);
         Task<bool> RemoveAsync(string name);
+
+        Task<ICollection<Achievement>> GetAllAsync(string pattern);
         Task<ICollection<Achievement>> GetAllAsync();
     }
 }

@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="src\Entities\Request\" />
     <Folder Include="src\Entities\Response\" />
   </ItemGroup>
 

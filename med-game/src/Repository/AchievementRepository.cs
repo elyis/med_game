@@ -1,9 +1,8 @@
 ﻿using med_game.Models;
 using med_game.src.Core.IRepository;
 using med_game.src.Data;
-using med_game.src.Entities.Request;
+using med_game.src.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata.Ecma335;
 
 namespace med_game.src.Repository
 {
@@ -29,7 +28,7 @@ namespace med_game.src.Repository
                 Description = achievementBody.Description,
                 CountPoints = achievementBody.CountPoints,
                 MaxCountPoints = achievementBody.MaxCountPoints,
-                Image = achievementBody.urlIcon
+                Image = achievementBody.UrlIcon
             };
 
             var result = await _dbContext.AddAsync(achievement);
@@ -37,10 +36,11 @@ namespace med_game.src.Repository
             return result.Entity;
         }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<ICollection<Achievement>> GetAllAsync(string pattern)
+            => await _dbContext.Achievements
+            .Where(a => EF.Functions
+                .Like(a.Name.ToLower(), $"%{pattern.ToLower()}%"))
+            .ToListAsync();
 
         public async Task<ICollection<Achievement>> GetAllAsync()
             => await _dbContext.Achievements
@@ -56,17 +56,29 @@ namespace med_game.src.Repository
 
         public async Task<bool> RemoveAsync(int id)
         {
-            var isExist = await GetAsync(id);
-            if (isExist == null) 
+            var achivement = await GetAsync(id);
+            if (achivement == null) 
                 return false;
 
-            var res = _dbContext.Remove(id);
-            return res == null ? true : false;
+            var result = _dbContext.Remove(achivement);
+            _dbContext.SaveChanges();
+            return result == null ? false : true;
         }
 
-        public Task<bool> RemoveAsync(string name)
+        public async Task<bool> RemoveAsync(string name)
         {
-            throw new NotImplementedException();
+            var achivement = await GetAsync(name);
+            if (achivement == null) 
+                return false;
+
+            var result = _dbContext.Achievements.Remove(achivement);
+            _dbContext.SaveChanges();
+            return result == null ? false : true;
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }
