@@ -3,6 +3,7 @@ using med_game.src.Data;
 using med_game.src.Entities;
 using med_game.src.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
 namespace med_game.src.Controllers
@@ -34,6 +35,9 @@ namespace med_game.src.Controllers
         [ProducesResponseType(typeof(List<AchievementBody>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<List<AchievementBody>>> GetByName(string pattern)
         {
+            if(pattern.IsNullOrEmpty())
+                return BadRequest();
+
             var result = await _achievementRepository.GetAllAsync(pattern);
             return result == null ? 
                 NotFound() : 
@@ -56,6 +60,9 @@ namespace med_game.src.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public async Task<IActionResult> RemoveAchievementByName(string name)
         {
+            if(name.IsNullOrEmpty())
+                return BadRequest();
+
             var result = await _achievementRepository.RemoveAsync(name);
             return result == false ? NotFound() : NoContent();
         }

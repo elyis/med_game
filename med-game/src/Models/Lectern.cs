@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using med_game.src.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace med_game.src.Models
 {
@@ -10,5 +11,14 @@ namespace med_game.src.Models
         public string? Description { get; set; }
 
         public List<Module> Modules { get; set; } = new();
+
+        public LecternBody ToLecternBody()
+        {
+            return new LecternBody
+            {
+                Name = Name,
+                Description = Description
+            };
+        }
     }
 }

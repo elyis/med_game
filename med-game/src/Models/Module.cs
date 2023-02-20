@@ -1,4 +1,6 @@
-﻿namespace med_game.src.Models
+﻿using med_game.src.Entities;
+
+namespace med_game.src.Models
 {
     public class Module
     {
@@ -9,5 +11,14 @@
 
         public Lectern Lectern { get; set; }
         public List<Question> Questions { get; set; }
+
+        public ModuleBody ToModuleBody()
+        {
+            return new ModuleBody
+            {
+                ModuleName = Name,
+                Description = Description,
+            };
+        }
     }
 }
