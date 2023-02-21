@@ -1,4 +1,6 @@
-﻿namespace med_game.src.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace med_game.src.Entities
 {
     public class AnswerOption
     {
@@ -7,6 +9,7 @@
         public string? Image { get; set; }
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TypeAnswer
     {
         Image,

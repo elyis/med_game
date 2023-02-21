@@ -14,5 +14,18 @@ namespace med_game.src.Entities.Request
 
         public AnswerOption RightAnswer { get; set; }
         public List<AnswerOption> ListOfAnswers { get; set; }
+
+        public QuestionBody ToQuestionBody()
+            => new QuestionBody 
+            { 
+                Text= Text, 
+                Description = Description,
+                Image = Image, 
+                Type = TypeQuestion, 
+                TimeSeconds = TimeSeconds,
+                RightAnswer = RightAnswer, 
+                NumOfPointsPerAnswer = NumOfPointsPerAnswer, 
+                Answers = ListOfAnswers 
+            };
     }
 }

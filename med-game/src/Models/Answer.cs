@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using med_game.src.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace med_game.src.Models
 {
@@ -12,5 +13,13 @@ namespace med_game.src.Models
 
 
         public List<Question> Questions { get; set; } = new();
+
+        public AnswerOption ToAnswerOption()
+            => new AnswerOption
+            {
+                Text = Description,
+                Type = (TypeAnswer)Enum.Parse(typeof(TypeAnswer), Type),
+                Image = Image
+            };
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace med_game
 {
@@ -31,6 +32,7 @@ namespace med_game
             {
                 options.SuppressMapClientErrors = true;
             });
+
             services.AddDistributedMemoryCache();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
