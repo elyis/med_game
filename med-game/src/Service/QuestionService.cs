@@ -34,7 +34,11 @@ namespace med_game.src.Service
 
             var answers = await _answerRepository.AddRange(questionBody.Answers);
             List<Answer> answerList = answers.ToList();
-            var rightAnswerIndex = answerList.FindIndex(a => a.ToAnswerOption() == questionBody.RightAnswer);
+
+            var rightAnswerIndex = answerList.FindIndex(a => a.ToAnswerOption().Equals(questionBody.RightAnswer));
+            if(rightAnswerIndex == -1)
+                return null;
+
             var question = await _questionRepository.AddAsync(questionBody, module, answerList, rightAnswerIndex);
             return question;
         }

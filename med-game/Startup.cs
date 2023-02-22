@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Text.Json.Serialization;
+using Microsoft.OpenApi.Models;
 
 namespace med_game
 {
@@ -35,7 +35,18 @@ namespace med_game
 
             services.AddDistributedMemoryCache();
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(options =>
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Med-game Api",
+                    Description = "Api for game of mediicine university", 
+                }
+                )
+            );
+
+            //services.AddSwaggerGen();
+
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.Zero;

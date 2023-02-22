@@ -1,14 +1,13 @@
 ﻿using med_game.src.Core.IRepository;
 using med_game.src.Core.IService;
 using med_game.src.Data;
+using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using med_game.src.Models;
 using med_game.src.Repository;
 using med_game.src.Service;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 using System.Net;
-using System.Runtime.CompilerServices;
 
 namespace med_game.src.Controllers
 {
@@ -32,11 +31,14 @@ namespace med_game.src.Controllers
 
 
             _questionService = new QuestionService(_answerRepository, _questionRepository);
-
         }
 
+
+
         [HttpPost]
-        [ProducesResponseType(typeof(Question), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> CreateQuestion(RequestedQuestionBody questionBody)
         {
             Module? module = await _moduleRepository.GetAsync(questionBody.LecternName, questionBody.ModuleName);
@@ -45,6 +47,28 @@ namespace med_game.src.Controllers
 
             var result = await _questionService.AddAsync(questionBody.ToQuestionBody(), module);
             return result == null ? Conflict() : Ok();
+        }
+
+
+        [HttpDelete]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        public async Task<IActionResult> RemoveQuestion(RemovableQuestionBody questionBody)
+        {
+            Module? module = await _moduleRepository.GetAsync(questionBody.LecternName, questionBody.ModuleName);
+            if (module == null)
+                return NotFound("Module not found");
+
+            QuestionProperties questionProperties = new QuestionProperties
+            {
+                Description = questionBody.Description,
+                Image = questionBody.Image,
+                Text = questionBody.Text,
+                Type = questionBody.TypeQuestion
+            };
+
+            var result = await _questionRepository.DeleteAsync(questionProperties, module);
+            return result == false ? NotFound() : NoContent();
         }
     }
 }

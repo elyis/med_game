@@ -38,9 +38,9 @@ namespace med_game.src.Repository
             List<Answer> answers = new List<Answer>();
 
             var answersInDb = await GetAllAsync(answerOptions);
+            var temp = answersInDb.Select(x => x.ToAnswerOption());
 
-            var answersNotInDb = answerOptions
-                .Except(answersInDb.Select(a => a.ToAnswerOption()))
+            var answersNotInDb = answerOptions.Where(a => !temp.Contains(a))
                 .ToList();
             
             foreach(var answer in answersNotInDb)
@@ -56,8 +56,8 @@ namespace med_game.src.Repository
             }
 
             _context.Answers.AddRange(answers);
-            answers.AddRange(answersInDb);
             _context.SaveChanges();
+            answers.AddRange(answersInDb);
 
             return answers;
         }
@@ -112,7 +112,6 @@ namespace med_game.src.Repository
                     a.Description == answer.Text && 
                     a.Type == Enum.GetName(typeof(TypeAnswer), answer.Type) && 
                     a.Image == answer.Image);
-
-
     }
+
 }

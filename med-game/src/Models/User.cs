@@ -13,6 +13,7 @@ namespace med_game.src.Models
         public int Rating { get; set; }
         public string? Image { get; set; }
         public string? TokenHash { get; set; }
+        public DateTime TokenValidBefore { get; set; }
         public List<Achievement> Achievements { get; set; } = new();
     }
 }

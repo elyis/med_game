@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Folder Include="src\Entities\Response\" />
+    <Folder Include="src\Utility\" />
   </ItemGroup>
 
 </Project>
