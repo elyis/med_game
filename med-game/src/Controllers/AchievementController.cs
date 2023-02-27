@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
-using Xunit;
 
 namespace med_game.src.Controllers
 {
@@ -48,6 +47,7 @@ namespace med_game.src.Controllers
             var result = await _achievementService.AddAsync(achievementBody);
             return result == null ? Conflict() : Ok();
         }
+
 
         [HttpGet("all/{pattern}")]
         [ProducesResponseType(typeof(List<AchievementBody>), (int)HttpStatusCode.OK)]

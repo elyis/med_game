@@ -6,6 +6,7 @@ using med_game.src.Managers;
 using System.Security.Claims;
 using med_game.src.Models;
 
+
 namespace med_game.src.Service
 {
     public class AuthService : IAuthService
@@ -70,7 +71,7 @@ namespace med_game.src.Service
         {
             string? email = _jwtManager
                 .GetClaimsFromJwt(tokenPair.AccessToken)
-                .FirstOrDefault(e => e.ValueType == ClaimTypes.Email)
+                .FirstOrDefault(e => e.Type == ClaimTypes.Email)
                 ?.Value;
 
             if (email == null)

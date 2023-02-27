@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
+
 namespace med_game.src.Controllers
 {
     [Route("lectern")]

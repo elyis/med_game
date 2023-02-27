@@ -19,6 +19,7 @@ namespace med_game.src.Controllers
         private readonly IModuleRepository _moduleRepository;
         private readonly ILecternRepository _lecternRepository;
         private readonly IModuleService _moduleService;
+
         public ModuleController()
         {
             AppDbContext dbContext = new AppDbContext();
@@ -28,13 +29,19 @@ namespace med_game.src.Controllers
             _moduleService = new ModuleService(_moduleRepository, _lecternRepository);
         }
 
+
         [HttpPost]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.Conflict)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [Authorize(Roles = "Admin")]
 
         public async Task<ActionResult> CreateModule(RequestedModuleBody moduleBody)
         {
+            var lectern = await _lecternRepository.GetAsync(moduleBody.LecternName);
+            if(lectern == null) 
+                return NotFound();
+
             var result = await _moduleService.CreateModule(moduleBody);
             return result == null ? Conflict() : Ok();
         }

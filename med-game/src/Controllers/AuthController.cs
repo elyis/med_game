@@ -75,5 +75,7 @@ namespace med_game.src.Controllers
             var result = await _authService.RegisterAsync(registrationBody, Roles.Admin);
             return result == null ? Conflict("Email is exist") : Ok(result);
         }
+
+
     }
 }
