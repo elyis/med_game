@@ -1,4 +1,5 @@
-﻿using med_game.src.Core.IRepository;
+﻿using med_game.Models;
+using med_game.src.Core.IRepository;
 using med_game.src.Data;
 using med_game.src.Entities.Request;
 using med_game.src.Models;
@@ -15,9 +16,24 @@ namespace med_game.src.Repository
             _context = appDbContext;
         }
 
-        public Task<User?> AddAsync(RegistrationBody registrationBody)
+        public async Task<User?> AddAsync(RegistrationBody registrationBody, string role)
         {
-            throw new NotImplementedException();
+            User? user = await GetAsync(registrationBody.Email);
+            if (user != null)
+                return null;
+
+            var model = new User 
+            { 
+                Email = registrationBody.Email, 
+                Password = registrationBody.Password, 
+                Nickname = registrationBody.Nickname,
+                RoleName = role,
+            };
+
+            var result = await _context.Users.AddAsync(model);
+            await _context.SaveChangesAsync();
+            return result.Entity;
+
         }
 
         public void Dispose()
@@ -32,7 +48,7 @@ namespace med_game.src.Repository
             => await _context.Users.FindAsync(id);
 
         public async Task<User?> GetAsync(string email)
-            => await _context.Users.FindAsync(email);
+            => await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
         public async Task<bool> RemoveAsync(long id)
         {
@@ -54,7 +70,7 @@ namespace med_game.src.Repository
             return result == null ? false : true;
         }
 
-        public async Task<bool> UpdateToken(string refreshTokenHash, long id)
+        public async Task<bool> UpdateTokenAsync(string refreshTokenHash, long id)
         {
             User? user = await GetAsync(id);
             if(user == null)
@@ -64,11 +80,39 @@ namespace med_game.src.Repository
             user.TokenValidBefore= DateTime.UtcNow.AddDays(15);
 
             _context.SaveChanges();
+            return true;
         }
 
-        public Task<bool> UpdateToken(string refreshToken, string email)
+        public async Task<bool> UpdateTokenAsync(string refreshTokenHash, string email)
         {
-            throw new NotImplementedException();
+            User? user = await GetAsync(email);
+            if (user == null)
+                return false;
+
+            user.TokenHash = refreshTokenHash;
+            user.TokenValidBefore = DateTime.UtcNow.AddDays(15);
+
+            _context.SaveChanges();
+            return true;
+        }
+
+        public async Task<User?> LoginAsync(Login login)
+            => await _context.Users
+            .FirstOrDefaultAsync
+            (
+                u => u.Email == login.Email
+                &&
+                u.Password == login.PasswordHash
+            );
+
+        public Task AddAchievementToEveryone(Achievement achievement)
+        {
+            var users = _context.Users;
+            foreach ( var user in users )
+                user.Achievements.Add(achievement);
+
+            _context.SaveChanges();
+            return Task.CompletedTask;
         }
     }
 }

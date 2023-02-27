@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using med_game.src.Data;
@@ -11,9 +12,11 @@ using med_game.src.Data;
 namespace med_game.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230226042003_tokenUser")]
+    partial class tokenUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,13 +116,21 @@ namespace med_game.Migrations
 
             modelBuilder.Entity("med_game.src.Models.Friend", b =>
                 {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
                     b.Property<long>("AuthorId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("SubscriberId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("AuthorId", "SubscriberId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
 
                     b.HasIndex("SubscriberId");
 
@@ -265,11 +276,6 @@ namespace med_game.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
 
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<string>("TokenHash")
                         .HasColumnType("text");
 
@@ -317,7 +323,7 @@ namespace med_game.Migrations
             modelBuilder.Entity("med_game.src.Models.Friend", b =>
                 {
                     b.HasOne("med_game.src.Models.User", "Author")
-                        .WithMany("Friends")
+                        .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -325,6 +331,7 @@ namespace med_game.Migrations
                     b.HasOne("med_game.src.Models.User", "Subscriber")
                         .WithMany()
                         .HasForeignKey("SubscriberId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Author");
@@ -381,11 +388,6 @@ namespace med_game.Migrations
             modelBuilder.Entity("med_game.src.Models.Module", b =>
                 {
                     b.Navigation("Questions");
-                });
-
-            modelBuilder.Entity("med_game.src.Models.User", b =>
-                {
-                    b.Navigation("Friends");
                 });
 #pragma warning restore 612, 618
         }

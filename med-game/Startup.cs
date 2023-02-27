@@ -1,6 +1,8 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using med_game.src.Data;
+using med_game.src.Models;
 
 namespace med_game
 {
@@ -25,9 +27,11 @@ namespace med_game
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-                });
+                }
+            );
 
             services.AddAuthorization();
+
             services.AddControllers().ConfigureApiBehaviorOptions(options =>
             {
                 options.SuppressMapClientErrors = true;
@@ -44,8 +48,6 @@ namespace med_game
                 }
                 )
             );
-
-            //services.AddSwaggerGen();
 
             services.AddSession(options =>
             {
@@ -70,7 +72,31 @@ namespace med_game
             app.UseHttpsRedirection();
             app.UseSession();
             app.MapControllers();
+            app.UseWebSockets(new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(20),
+            });
+
+            //InitDb();
+
             app.Run();
+        }
+
+        private void InitDb()
+        {
+            using (AppDbContext context =  new AppDbContext())
+            {
+                var admin = new User
+                {
+                    Email = "elyi7367@gmail.com",
+                    Nickname = "root",
+                    Password = "5c4769a51f45f8f0412a4db922d1f4237ce7d5551107d048e35c4e677527115633a4450ada2fb5b29d012db7f6a7273ca680af2895914cc706db45683f9fdc40",
+                    RoleName = Enum.GetName(typeof(Roles), Roles.Admin)!
+                };
+
+                context.Users.Add(admin);
+                context.SaveChanges();
+            }
         }
     }
 }

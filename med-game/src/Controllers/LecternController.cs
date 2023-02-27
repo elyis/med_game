@@ -2,6 +2,7 @@
 using med_game.src.Data;
 using med_game.src.Entities;
 using med_game.src.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
@@ -23,6 +24,8 @@ namespace med_game.src.Controllers
         [HttpPost]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.Conflict)]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> CreateLectern(List<LecternBody> lecternBodies)
         {
             var result = await _lecternRepository.CreateRangeAsync(lecternBodies);
@@ -33,6 +36,8 @@ namespace med_game.src.Controllers
         [HttpDelete("rm/{name}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> RemoveLectern(string name)
         {
             if(name.IsNullOrEmpty()) 
@@ -46,6 +51,7 @@ namespace med_game.src.Controllers
         [HttpGet("{name}")]
         [ProducesResponseType(typeof(LecternBody), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
+
         public async Task<ActionResult<LecternBody>> GetByName(string name)
         {
             if(name.IsNullOrEmpty())

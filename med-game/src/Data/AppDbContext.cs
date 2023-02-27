@@ -24,7 +24,12 @@ namespace med_game.src.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Entity<Friend>(f =>
+            {
+                f.HasKey(e => new { e.AuthorId, e.SubscriberId });
+                f.HasOne(e => e.Author).WithMany(e => e.Friends);
+                f.HasOne(e => e.Subscriber).WithMany().OnDelete(DeleteBehavior.ClientSetNull);
+            });
         }
     }
 }

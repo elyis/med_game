@@ -5,6 +5,7 @@ using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using med_game.src.Repository;
 using med_game.src.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -30,15 +31,19 @@ namespace med_game.src.Controllers
         [HttpPost]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.Conflict)]
+        [Authorize(Roles = "Admin")]
+
         public async Task<ActionResult> CreateModule(RequestedModuleBody moduleBody)
         {
             var result = await _moduleService.CreateModule(moduleBody);
             return result == null ? Conflict() : Ok();
         }
 
+
         [HttpGet("{lecternName}")]
         [ProducesResponseType(typeof(List<ModuleBody>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
+
         public async Task<ActionResult> GetModulesByLecternName(string lecternName)
         {
             var result = await _moduleService.GetModules(lecternName);
@@ -49,9 +54,12 @@ namespace med_game.src.Controllers
                         m.ToModuleBody()).ToList());
         }
 
+
         [HttpDelete]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> RemoveModule(RemovableModuleBody moduleBody)
         {
             var result = await _moduleRepository.RemoveAsync(moduleBody.LecternName, moduleBody.ModuleName);
