@@ -2,8 +2,10 @@
 {
     public class FriendRequest
     {
-        public long Id { get; set; }
-        public User Author { get; set; }
+        public long SubscriberId { get; set; }
+        public long AuthorId { get; set; }
+
         public User Subscriber { get; set; }
+        public User Author { get; set; }
     }
 }

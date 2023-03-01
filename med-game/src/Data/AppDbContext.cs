@@ -1,4 +1,5 @@
 ﻿using med_game.Models;
+using med_game.src.models;
 using med_game.src.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,6 @@ namespace med_game.src.Data
         public DbSet<Lectern> Lecterns { get; set; }
         public DbSet<Module> Modules { get; set; }
         public DbSet<Question> Questions { get; set; }
-        public DbSet<FriendRequest> FriendRequests { get; set; }
-        public DbSet<Friend> Friends { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -24,11 +23,21 @@ namespace med_game.src.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+           
             modelBuilder.Entity<Friend>(f =>
             {
-                f.HasKey(e => new { e.AuthorId, e.SubscriberId });
-                f.HasOne(e => e.Author).WithMany(e => e.Friends);
-                f.HasOne(e => e.Subscriber).WithMany().OnDelete(DeleteBehavior.ClientSetNull);
+                f.HasKey(f => new { f.AuthorId, f.SubscriberId });
+                f.HasOne(f => f.Author).WithMany(u => u.Friends);
+                f.HasOne(f => f.Subscriber).WithMany()
+                    .OnDelete(DeleteBehavior.ClientSetNull);
+            });
+
+            modelBuilder.Entity<FriendRequest>(f =>
+            {
+                f.HasKey(f => new {f.AuthorId, f.SubscriberId });
+                f.HasOne(f => f.Subscriber).WithMany(u => u.Subscribers);
+                f.HasOne(f => f.Author).WithMany()
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
         }
     }

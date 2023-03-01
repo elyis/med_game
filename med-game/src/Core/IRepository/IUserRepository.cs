@@ -19,5 +19,8 @@ namespace med_game.src.Core.IRepository
 
         Task<User?> LoginAsync(Login login);
         Task AddAchievementToEveryone(Achievement achievement);
+
+        Task<bool> ApplyForFriendship(long id, long friendId);
+        Task<bool> ApplyForFriendship(string email, string friendEmail);
     }
 }

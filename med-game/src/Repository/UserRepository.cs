@@ -114,5 +114,15 @@ namespace med_game.src.Repository
             _context.SaveChanges();
             return Task.CompletedTask;
         }
+
+        public async Task<bool> ApplyForFriendship(long id, long friendId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> ApplyForFriendship(string email, string friendEmail)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using med_game.Models;
+using med_game.src.models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,9 +22,9 @@ namespace med_game.src.Models
 
         public List<Achievement> Achievements { get; set; } = new();
 
-        
+
         public List<Friend> Friends { get; set; } = new();
-        //public List<User> Subscribers { get; set; } = new();
+        public List<FriendRequest> Subscribers { get; set; } = new();
     }
 
 

@@ -111,7 +111,7 @@ namespace med_game.Migrations
                     b.ToTable("Answers");
                 });
 
-            modelBuilder.Entity("med_game.src.Models.Friend", b =>
+            modelBuilder.Entity("med_game.src.Models.FriendRequest", b =>
                 {
                     b.Property<long>("AuthorId")
                         .HasColumnType("bigint");
@@ -123,30 +123,7 @@ namespace med_game.Migrations
 
                     b.HasIndex("SubscriberId");
 
-                    b.ToTable("Friends");
-                });
-
-            modelBuilder.Entity("med_game.src.Models.FriendRequest", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("AuthorId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SubscriberId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("SubscriberId");
-
-                    b.ToTable("FriendRequests");
+                    b.ToTable("FriendRequest");
                 });
 
             modelBuilder.Entity("med_game.src.Models.Lectern", b =>
@@ -284,6 +261,21 @@ namespace med_game.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("med_game.src.models.Friend", b =>
+                {
+                    b.Property<long>("AuthorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SubscriberId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AuthorId", "SubscriberId");
+
+                    b.HasIndex("SubscriberId");
+
+                    b.ToTable("Friend");
+                });
+
             modelBuilder.Entity("AchievementUser", b =>
                 {
                     b.HasOne("med_game.Models.Achievement", null)
@@ -314,34 +306,15 @@ namespace med_game.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("med_game.src.Models.Friend", b =>
-                {
-                    b.HasOne("med_game.src.Models.User", "Author")
-                        .WithMany("Friends")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("med_game.src.Models.User", "Subscriber")
-                        .WithMany()
-                        .HasForeignKey("SubscriberId")
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Subscriber");
-                });
-
             modelBuilder.Entity("med_game.src.Models.FriendRequest", b =>
                 {
                     b.HasOne("med_game.src.Models.User", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("med_game.src.Models.User", "Subscriber")
-                        .WithMany()
+                        .WithMany("Subscribers")
                         .HasForeignKey("SubscriberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -373,6 +346,24 @@ namespace med_game.Migrations
                     b.Navigation("Module");
                 });
 
+            modelBuilder.Entity("med_game.src.models.Friend", b =>
+                {
+                    b.HasOne("med_game.src.Models.User", "Author")
+                        .WithMany("Friends")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("med_game.src.Models.User", "Subscriber")
+                        .WithMany()
+                        .HasForeignKey("SubscriberId")
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Subscriber");
+                });
+
             modelBuilder.Entity("med_game.src.Models.Lectern", b =>
                 {
                     b.Navigation("Modules");
@@ -386,6 +377,8 @@ namespace med_game.Migrations
             modelBuilder.Entity("med_game.src.Models.User", b =>
                 {
                     b.Navigation("Friends");
+
+                    b.Navigation("Subscribers");
                 });
 #pragma warning restore 612, 618
         }

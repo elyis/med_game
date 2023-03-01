@@ -2,12 +2,12 @@
 
 namespace med_game.src.Core.IRepository
 {
-    public interface IFriendRequestRepository
-    {
-        Task<FriendRequest?> AddAsync(User author, User subscriber);
-        Task<FriendRequest?> GetAsync(long id);
-        Task<bool> RemoveAsync(long id);
-        Task<bool> RemoveAsync(string authorEmail, string subscriberEmail);
-        IEnumerable<FriendRequest> GetAll(User author);
-    }
+    //public interface IFriendRequestRepository
+    //{
+    //    Task<FriendRequest?> AddAsync(User author, User subscriber);
+    //    Task<FriendRequest?> GetAsync(long id);
+    //    Task<bool> RemoveAsync(long id);
+    //    Task<bool> RemoveAsync(string authorEmail, string subscriberEmail);
+    //    IEnumerable<FriendRequest> GetAll(User author);
+    //}
 }
