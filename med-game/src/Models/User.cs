@@ -23,8 +23,10 @@ namespace med_game.src.Models
         public List<Achievement> Achievements { get; set; } = new();
 
 
-        public List<Friend> Friends { get; set; } = new();
-        public List<FriendRequest> Subscribers { get; set; } = new();
+        public List<Friend> FriendsTo { get; set; } = new();
+        public List<Friend> FriendsFrom { get; set; } = new();
+        public List<FriendRequest> FriendRequestToMe { get; set; } = new();
+        public List<FriendRequest> FriendRequestFromMe { get; set; } = new();
     }
 
 

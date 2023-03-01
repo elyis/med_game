@@ -55,13 +55,6 @@ namespace med_game.src.Managers
             byte[] bytes = _hmac512.ComputeHash(Encoding.UTF8.GetBytes(guidToken));
             return Convert.ToBase64String(bytes);
         }
-
-        public List<Claim> GetClaimsFromJwt(string token)
-        {
-            return new JwtSecurityTokenHandler()
-                .ReadJwtToken(token)
-                .Claims.ToList();
-        }
     }
 }
 

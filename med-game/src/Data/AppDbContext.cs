@@ -27,17 +27,31 @@ namespace med_game.src.Data
             modelBuilder.Entity<Friend>(f =>
             {
                 f.HasKey(f => new { f.AuthorId, f.SubscriberId });
-                f.HasOne(f => f.Author).WithMany(u => u.Friends);
-                f.HasOne(f => f.Subscriber).WithMany()
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+
+                f.HasOne(f => f.Author)
+                    .WithMany(u => u.FriendsFrom)
+                    .HasForeignKey(f => f.AuthorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                f.HasOne(f => f.Subscriber)
+                    .WithMany(u => u.FriendsTo)
+                    .HasForeignKey(f => f.SubscriberId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<FriendRequest>(f =>
             {
                 f.HasKey(f => new {f.AuthorId, f.SubscriberId });
-                f.HasOne(f => f.Subscriber).WithMany(u => u.Subscribers);
-                f.HasOne(f => f.Author).WithMany()
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+
+                f.HasOne(f => f.Subscriber)
+                    .WithMany(u => u.FriendRequestFromMe)
+                    .HasForeignKey(f => f.SubscriberId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                f.HasOne(f => f.Author)
+                    .WithMany(u => u.FriendRequestToMe)
+                    .HasForeignKey(f => f.AuthorId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

@@ -5,7 +5,7 @@
 namespace med_game.Migrations
 {
     /// <inheritdoc />
-    public partial class friend_and_friend_request : Migration
+    public partial class friend_and_friend_requests : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -47,13 +47,14 @@ namespace med_game.Migrations
                         name: "FK_FriendRequest_Users_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_FriendRequest_Users_SubscriberId",
                         column: x => x.SubscriberId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(

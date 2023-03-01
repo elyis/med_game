@@ -5,17 +5,19 @@ using med_game.src.Entities;
 using med_game.src.Managers;
 using System.Security.Claims;
 using med_game.src.Models;
-
+using med_game.src.Utility;
 
 namespace med_game.src.Service
 {
     public class AuthService : IAuthService
     {
         private readonly JwtManager _jwtManager;
+        private readonly JwtUtilities _jwtUtilities;
         private readonly IUserRepository _userRepository;
 
         public AuthService(JwtManager jwtManager, IUserRepository userRepository)
         {
+            _jwtUtilities = new JwtUtilities();
             _jwtManager = jwtManager;
             _userRepository = userRepository;
         }
@@ -30,7 +32,6 @@ namespace med_game.src.Service
 
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, user.Email),
                 new Claim("UserId", user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.RoleName)
             };
@@ -53,7 +54,6 @@ namespace med_game.src.Service
 
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, user.Email),
                 new Claim("UserId", newUser.Id.ToString()),
                 new Claim(ClaimTypes.Role, roleName)
             };
@@ -69,15 +69,11 @@ namespace med_game.src.Service
 
         public async Task<TokenPair?> UpdateTokenAsync(TokenPair tokenPair)
         {
-            string? email = _jwtManager
-                .GetClaimsFromJwt(tokenPair.AccessToken)
-                .FirstOrDefault(e => e.Type == ClaimTypes.Email)
-                ?.Value;
-
-            if (email == null)
+            string? userIdClaim = _jwtUtilities.GetClaimUserId(tokenPair.AccessToken);
+            if (!long.TryParse(userIdClaim, out long userId))
                 return null;
 
-            var user = await _userRepository.GetAsync(email);
+            var user = await _userRepository.GetAsync(userId);
             if (user == null) 
                 return null;
 
@@ -89,7 +85,6 @@ namespace med_game.src.Service
             {
                 List<Claim> claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Email, email),
                         new Claim("UserId", user.Id.ToString()),
                         new Claim(ClaimTypes.Role, user.RoleName)
                     };

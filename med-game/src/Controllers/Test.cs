@@ -2,6 +2,7 @@
 using med_game.src.models;
 using med_game.src.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -25,17 +26,15 @@ namespace med_game.src.Controllers
                     new User { Email = "3@3", Nickname = "3", Password = "password", RoleName = "User" },
                 };
 
-                users[0].Friends.AddRange(new List<Friend> { new Friend { Subscriber = users[1] }, new Friend { Subscriber = users[2] } });
-
-
+                users[0].FriendsTo.AddRange(new List<Friend> { new Friend { Subscriber = users[1] }, new Friend { Subscriber = users[2] } });
 
                 JsonSerializerOptions options = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.IgnoreCycles, WriteIndented = true };
-                var result = new List<User> { users[1], users[2] };
 
                 context.Users.AddRange(users);
                 context.SaveChanges();
 
-                await Response.WriteAsJsonAsync(users, options);
+
+                await Response.WriteAsJsonAsync(users[1], options);
             }
 
         }

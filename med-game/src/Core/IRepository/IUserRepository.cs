@@ -9,6 +9,9 @@ namespace med_game.src.Core.IRepository
         Task<User?> AddAsync(RegistrationBody registrationBody, string role);
         Task<User?> GetAsync(long id);
         Task<User?> GetAsync(string email);
+        Task<User?> GetAsyncWithSubscriber(long id);
+        Task<User?> GetAsyncWithSubscriber(string email);
+
         IEnumerable<User> GetAll();
 
         Task<bool> RemoveAsync(long id);
@@ -20,7 +23,12 @@ namespace med_game.src.Core.IRepository
         Task<User?> LoginAsync(Login login);
         Task AddAchievementToEveryone(Achievement achievement);
 
-        Task<bool> ApplyForFriendship(long id, long friendId);
-        Task<bool> ApplyForFriendship(string email, string friendEmail);
+        Task<FriendRequest?> GetFriendRequest(long id, string friendEmail);
+        Task<bool> ApplyForFriendship(long id, string friendEmail);
+        Task<bool> CancelTheFriendshipRequestAsync(long id, string friendEmail);
+        Task<bool> IsSameUsersAsync(long id, string email);
+
+        Task<bool> ChangeSubscriberToFriend(long id, string subscriberEmail);
+        //Task<Friend?> GetFriendAsync(long id, string friendEmail);
     }
 }

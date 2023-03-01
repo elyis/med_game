@@ -12,8 +12,8 @@ using med_game.src.Data;
 namespace med_game.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230301030515_friend_and_friend_request")]
-    partial class friend_and_friend_request
+    [Migration("20230301111341_friend_and_friend_requests")]
+    partial class friend_and_friend_requests
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -312,14 +312,15 @@ namespace med_game.Migrations
             modelBuilder.Entity("med_game.src.Models.FriendRequest", b =>
                 {
                     b.HasOne("med_game.src.Models.User", "Author")
-                        .WithMany()
+                        .WithMany("FriendRequestToMe")
                         .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("med_game.src.Models.User", "Subscriber")
-                        .WithMany("Subscribers")
+                        .WithMany("FriendRequestFromMe")
                         .HasForeignKey("SubscriberId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Author");
@@ -379,9 +380,11 @@ namespace med_game.Migrations
 
             modelBuilder.Entity("med_game.src.Models.User", b =>
                 {
-                    b.Navigation("Friends");
+                    b.Navigation("FriendRequestFromMe");
 
-                    b.Navigation("Subscribers");
+                    b.Navigation("FriendRequestToMe");
+
+                    b.Navigation("Friends");
                 });
 #pragma warning restore 612, 618
         }
