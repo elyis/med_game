@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using med_game.src.Data;
@@ -11,9 +12,11 @@ using med_game.src.Data;
 namespace med_game.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230302043122_testy")]
+    partial class testy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -350,13 +353,13 @@ namespace med_game.Migrations
             modelBuilder.Entity("med_game.src.models.Friends", b =>
                 {
                     b.HasOne("med_game.src.Models.User", "Friend")
-                        .WithMany("FriendsAcceptedByMe")
+                        .WithMany("FriendsTo")
                         .HasForeignKey("FriendId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("med_game.src.Models.User", "User")
-                        .WithMany("FriendsAcceptedMe")
+                        .WithMany("FriendsFrom")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -382,9 +385,9 @@ namespace med_game.Migrations
 
                     b.Navigation("FriendRequestToMe");
 
-                    b.Navigation("FriendsAcceptedByMe");
+                    b.Navigation("FriendsFrom");
 
-                    b.Navigation("FriendsAcceptedMe");
+                    b.Navigation("FriendsTo");
                 });
 #pragma warning restore 612, 618
         }

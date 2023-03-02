@@ -30,8 +30,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="src\Entities\Response\" />
-  </ItemGroup>
-
 </Project>

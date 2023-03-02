@@ -1,6 +1,9 @@
 ﻿using med_game.Models;
 using med_game.src.Entities.Request;
+using med_game.src.Entities.Response;
+using med_game.src.models;
 using med_game.src.Models;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace med_game.src.Core.IRepository
 {
@@ -9,8 +12,8 @@ namespace med_game.src.Core.IRepository
         Task<User?> AddAsync(RegistrationBody registrationBody, string role);
         Task<User?> GetAsync(long id);
         Task<User?> GetAsync(string email);
-        Task<User?> GetAsyncWithSubscriber(long id);
-        Task<User?> GetAsyncWithSubscriber(string email);
+        Task<User?> GetSubscribersAsync(long id);
+        Task<User?> GetSubscribersAsync(string email);
 
         IEnumerable<User> GetAll();
 
@@ -25,10 +28,23 @@ namespace med_game.src.Core.IRepository
 
         Task<FriendRequest?> GetFriendRequest(long id, string friendEmail);
         Task<bool> ApplyForFriendship(long id, string friendEmail);
-        Task<bool> CancelTheFriendshipRequestAsync(long id, string friendEmail);
+        Task<FriendRequest?> RemoveFriendRequestAsync(long id, string friendEmail);
         Task<bool> IsSameUsersAsync(long id, string email);
 
-        Task<bool> ChangeSubscriberToFriend(long id, string subscriberEmail);
-        //Task<Friend?> GetFriendAsync(long id, string friendEmail);
+        Task<bool> AddFriend(long id, string subscriberEmail);
+        Task<Friends?> GetFriendAsync(long id, string friendEmail);
+        Task<bool> RemoveFriend(long id, string friendEmail);
+
+        Task<User?> GetFriendsAsync(long id);
+        Task<User?> GetFriendsAsync(string email);
+
+        Task<FriendRequest?> GetFriendRequestFrom(long id, string friendEmail);
+        Task<FriendRequest?> GetFriendRequestTo(long id, string friendEmail);
+        Task<User?> GetFullAsync(long id);
+        Task<User?> GetFullAsync(string email);
+
+        Task<IEnumerable<FriendInfo>> GetFriendsAndSubscibersInfo(long id);
+        Task<IEnumerable<UserInfo>> GetUsers(long id, string nicknamePattern);
+
     }
 }

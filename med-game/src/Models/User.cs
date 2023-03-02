@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 namespace med_game.src.Models
 {
     [Index("Email", IsUnique = true)]
+    [Index("Rating", "Nickname")]
     public class User
     {
         public long Id { get; private set; }
@@ -23,8 +24,8 @@ namespace med_game.src.Models
         public List<Achievement> Achievements { get; set; } = new();
 
 
-        public List<Friend> FriendsTo { get; set; } = new();
-        public List<Friend> FriendsFrom { get; set; } = new();
+        public List<Friends> FriendsAcceptedMe { get; set; } = new();
+        public List<Friends> FriendsAcceptedByMe { get; set; } = new();
         public List<FriendRequest> FriendRequestToMe { get; set; } = new();
         public List<FriendRequest> FriendRequestFromMe { get; set; } = new();
     }

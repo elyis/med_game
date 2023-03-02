@@ -24,33 +24,33 @@ namespace med_game.src.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            
-            modelBuilder.Entity<Friend>(f =>
+            modelBuilder.Entity<Friends>(f =>
             {
-                f.HasKey(f => new { f.AuthorId, f.SubscriberId });
+                f.HasKey(f => new { f.UserId, f.FriendId });
 
-                f.HasOne(f => f.Author)
-                    .WithMany(u => u.FriendsFrom)
-                    .HasForeignKey(f => f.AuthorId)
+                f.HasOne(f => f.User)
+                    .WithMany(u => u.FriendsAcceptedByMe)
+                    .HasForeignKey(f => f.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                f.HasOne(f => f.Subscriber)
-                    .WithMany(u => u.FriendsTo)
-                    .HasForeignKey(f => f.SubscriberId)
+                f.HasOne(f => f.Friend)
+                    .WithMany(u => u.FriendsAcceptedMe)
+                    .HasForeignKey(f => f.FriendId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<FriendRequest>(f =>
             {
-                f.HasKey(f => new {f.AuthorId, f.SubscriberId });
+                f.HasKey(f => new {f.UserId, f.SubscriberId });
 
                 f.HasOne(f => f.Subscriber)
                     .WithMany(u => u.FriendRequestFromMe)
                     .HasForeignKey(f => f.SubscriberId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                f.HasOne(f => f.Author)
+                f.HasOne(f => f.User)
                     .WithMany(u => u.FriendRequestToMe)
-                    .HasForeignKey(f => f.AuthorId)
+                    .HasForeignKey(f => f.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
         }

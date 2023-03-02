@@ -59,8 +59,8 @@ namespace med_game.src.Controllers
             if (!long.TryParse(userIdClaim, out long userId))
                 return Unauthorized();
 
-            var result = await _userRepository.CancelTheFriendshipRequestAsync(userId, email);
-            return result == false ? NotFound() : NoContent();
+            var result = await _userRepository.RemoveFriendRequestAsync(userId, email);
+            return result == null ? NotFound() : NoContent();
         }
     }
 }

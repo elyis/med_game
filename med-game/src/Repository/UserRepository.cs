@@ -2,6 +2,7 @@
 using med_game.src.Core.IRepository;
 using med_game.src.Data;
 using med_game.src.Entities.Request;
+using med_game.src.Entities.Response;
 using med_game.src.models;
 using med_game.src.Models;
 using Microsoft.EntityFrameworkCore;
@@ -138,18 +139,14 @@ namespace med_game.src.Repository
 
         public async Task<FriendRequest?> GetFriendRequest(long id, string friendEmail)
         {
-            var user = await GetAsyncWithSubscriber(id);
-            var friend = await GetAsyncWithSubscriber(friendEmail);
+            var user = await GetSubscribersAsync(id);
+            var friend = await GetAsync(friendEmail);
 
             if(user == null || friend == null) 
                 return null;
 
-
-            FriendRequest friendRequestToUser = new FriendRequest { Author = user, Subscriber = friend };
-            FriendRequest friendRequestFromUser = new FriendRequest { Author = friend, Subscriber = user };
-
-            FriendRequest? userInToMe = user.FriendRequestToMe.FirstOrDefault(f => f.AuthorId == user.Id && f.SubscriberId == friend.Id);
-            FriendRequest? userInFromMe = user.FriendRequestFromMe.FirstOrDefault(f => f.AuthorId == friend.Id && f.SubscriberId == user.Id);
+            FriendRequest? userInToMe = user.FriendRequestToMe.FirstOrDefault(f => f.UserId == user.Id && f.SubscriberId == friend.Id);
+            FriendRequest? userInFromMe = user.FriendRequestFromMe.FirstOrDefault(f => f.UserId == friend.Id && f.SubscriberId == user.Id);
 
             if(userInToMe == null && userInFromMe == null)
                 return null;
@@ -159,40 +156,66 @@ namespace med_game.src.Repository
             return userInFromMe;
         }
 
-        public async Task<User?> GetAsyncWithSubscriber(long id)
+        public async Task<FriendRequest?> GetFriendRequestFrom(long id, string friendEmail)
+        {
+            var user = await GetSubscribersAsync(id);
+            var friend = await GetAsync(friendEmail);
+
+            if (user == null || friend == null)
+                return null;
+
+            FriendRequest? userInFromMe = user.FriendRequestFromMe.FirstOrDefault(f => f.UserId == friend.Id && f.SubscriberId == user.Id);
+            return userInFromMe;
+
+        }
+
+        public async Task<FriendRequest?> GetFriendRequestTo(long id, string friendEmail)
+        {
+            var user = await GetSubscribersAsync(id);
+            var friend = await GetAsync(friendEmail);
+
+            if (user == null || friend == null)
+                return null;
+
+            FriendRequest? userInToMe = user.FriendRequestToMe.FirstOrDefault(f => f.UserId == user.Id && f.SubscriberId == friend.Id);
+            return userInToMe;
+        }
+
+
+        public async Task<User?> GetSubscribersAsync(long id)
             => await _context.Users
                 .Include(u => u.FriendRequestFromMe)
                 .Include(u => u.FriendRequestToMe)
             .FirstOrDefaultAsync(u => u.Id == id);
 
-        public async Task<User?> GetAsyncWithSubscriber(string email)
+        public async Task<User?> GetSubscribersAsync(string email)
         => await _context.Users
                 .Include(u => u.FriendRequestFromMe)
                 .Include(u => u.FriendRequestToMe)
             .FirstOrDefaultAsync(u => u.Email == email);
 
-        public async Task<bool> CancelTheFriendshipRequestAsync(long id, string friendEmail)
+        public async Task<FriendRequest?> RemoveFriendRequestAsync(long id, string friendEmail)
         {
             bool isSameUsers = await IsSameUsersAsync(id, friendEmail);
             if (isSameUsers)
-                return true;
+                return null;
 
-            FriendRequest? requestForFriendship = await GetFriendRequest(id, friendEmail);
-            if (requestForFriendship == null)
-                return false;
+            FriendRequest? friendRequest = await GetFriendRequest(id, friendEmail);
+            if (friendRequest == null)
+                return null;
 
-            var user = await GetAsyncWithSubscriber(id);
+            var user = await GetSubscribersAsync(id);
             if(user == null) 
-                return false;
+                return null;
 
-            bool isRemovedToMe = user.FriendRequestToMe.Remove(requestForFriendship);
-            bool isRemoveFromMe = user.FriendRequestFromMe.Remove(requestForFriendship);
+            bool isRemovedToMe = user.FriendRequestToMe.Remove(friendRequest);
+            bool isRemoveFromMe = user.FriendRequestFromMe.Remove(friendRequest);
             if (isRemoveFromMe || isRemovedToMe)
             {
                 _context.SaveChanges();
-                return true;
+                return friendRequest;
             }
-            return false;
+            return null;
         }
 
         public async Task<bool> IsSameUsersAsync(long id, string email)
@@ -201,24 +224,347 @@ namespace med_game.src.Repository
             return result != null ? true : false;
         }
 
-        public Task<bool> ChangeSubscriberToFriend(long id, string subscriberEmail)
+        public async Task<bool> AddFriend(long id, string subscriberEmail)
         {
-            throw new NotImplementedException();
+            if(await IsSameUsersAsync(id, subscriberEmail)) 
+                return true;
+
+            Friends? friendRelation = await GetFriendAsync(id, subscriberEmail);
+            if (friendRelation != null)
+                return true;
+
+
+            User? user = await GetFriendsAsync(id);
+            User? friend = await GetAsync(subscriberEmail);
+            if (user == null || friend == null)
+                return false;
+
+
+            if(await GetFriendRequestTo(id, subscriberEmail) != null)
+            {
+                FriendRequest? friendRequest = await RemoveFriendRequestAsync(id, subscriberEmail);
+                if (friendRequest == null)
+                    return false;
+
+                user.FriendsAcceptedByMe.Add(new Friends { Friend = friend });
+                _context.SaveChanges();
+                return true;
+            }
+
+            return false;
         }
 
-        //public async Task<Friend?> GetFriendAsync(long id, string friendEmail)
-        //{
-        //    User? user = await _context.Users
-        //        .Include(u => u.Friends)
-        //        .FirstOrDefaultAsync(u => u.Id == id);
+        public async Task<Friends?> GetFriendAsync(long id, string friendEmail)
+        {
+            User? user = await GetFriendsAsync(id);
+            User? friend = await GetAsync(friendEmail);
+            if (user == null || friend == null)
+                return null;
 
-        //    User? friend = await 
+            Friends? acceptedMe = user.FriendsAcceptedMe.FirstOrDefault(u => u.UserId == friend.Id && u.FriendId == user.Id);
+            if(acceptedMe != null) 
+                return acceptedMe;
 
-        //    if (user == null) 
-        //        return null;
+            Friends? acceptedByMe = user.FriendsAcceptedByMe.FirstOrDefault(u => u.UserId == user.Id && u.FriendId == friend.Id);
+            if(acceptedByMe != null) 
+                return acceptedByMe;
+            return null;
+        }
 
-        //    return user.Friends.FirstOrDefault(f => f.A)
-        //}
+        //Удаление из друзей -> переход в подписчики
+        public async Task<bool> RemoveFriend(long id, string friendEmail)
+        {
+            Friends? friendRelation = await GetFriendAsync(id, friendEmail);
+            if (friendRelation == null)
+                return false;
+
+            User? user = await GetFriendsAsync(id);
+            User? subscriber = await GetAsync(friendEmail);
+            if (user == null || subscriber == null)
+                return false;
+
+            bool isRemovedFromMe = user.FriendsAcceptedMe.Remove(friendRelation);
+            bool isRemovedFromByMe = user.FriendsAcceptedByMe.Remove(friendRelation);
+            if (!isRemovedFromByMe && !isRemovedFromMe)
+                return false;
+
+            user.FriendRequestToMe.Add(new FriendRequest { Subscriber = subscriber });
+            _context.SaveChanges();
+
+            return isRemovedFromMe == false ? isRemovedFromByMe : isRemovedFromMe;
+
+        }
+
+        public async Task<User?> GetFriendsAsync(long id)
+            => await _context.Users
+                .Include(u => u.FriendsAcceptedByMe)
+                .Include(u => u.FriendsAcceptedMe)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+        public async Task<User?> GetFriendsAsync(string email)
+            => await _context.Users
+                .Include(u => u.FriendsAcceptedByMe)
+                .Include(u => u.FriendsAcceptedByMe)
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+        public async Task<User?> GetFullAsync(long id)
+            => await _context.Users
+                .Include(u => u.FriendRequestFromMe)
+                    .ThenInclude(u => u.User)
+                .Include(u => u.FriendRequestToMe)
+                    .ThenInclude(u => u.Subscriber)
+                .Include(u => u.FriendsAcceptedByMe)
+                    .ThenInclude(u => u.Friend)
+                .Include(u => u.FriendsAcceptedMe)
+                    .ThenInclude(u => u.User)
+
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+        public async Task<User?> GetFullAsync(string email)
+        => await _context.Users
+                .Include(u => u.FriendRequestFromMe)
+                    .ThenInclude(u => u.User)
+                .Include(u => u.FriendRequestToMe)
+                    .ThenInclude(u => u.Subscriber)
+                .Include(u => u.FriendsAcceptedByMe)
+                    .ThenInclude(u => u.Friend)
+                .Include(u => u.FriendsAcceptedMe)
+                    .ThenInclude(u => u.User)
+
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+        //Прости меня за такой поиск друзей и подписчиков
+        public async Task<IEnumerable<FriendInfo>> GetFriendsAndSubscibersInfo(long id)
+        {
+            List<FriendInfo> friendsAndSubscribers = new List<FriendInfo>();
+
+            User? user = await GetFullAsync(id);
+            
+
+            if (user != null)
+            {
+                if(
+                    user.FriendsAcceptedMe.Count == 0 && 
+                    user.FriendsAcceptedByMe.Count == 0 && 
+                    user.FriendRequestFromMe.Count == 0 && 
+                    user.FriendRequestToMe.Count == 0
+                  )
+                {
+                    return friendsAndSubscribers;
+                }
+
+                foreach(var friend in user.FriendsAcceptedMe)
+                {
+                    FriendInfo friendInfo = new FriendInfo
+                    {
+                        Email = friend.User.Email,
+                        Name = friend.User.Nickname,
+                        Icon = friend.User.Image,
+                        Status = FriendStatus.Friend,
+                        NumberPointsInRatingDepartment = friend.User.Rating,
+                        PlaceInRatingDepartment = 0
+                    };
+                    friendsAndSubscribers.Add(friendInfo);
+                }
+
+                foreach (var friend in user.FriendsAcceptedByMe)
+                {
+                    FriendInfo friendInfo = new FriendInfo
+                    {
+                        Email = friend.Friend.Email,
+                        Name = friend.Friend.Nickname,
+                        Icon = friend.Friend.Image,
+                        Status = FriendStatus.Friend,
+                        NumberPointsInRatingDepartment = friend.Friend.Rating,
+                        PlaceInRatingDepartment = 0
+                    };
+                    friendsAndSubscribers.Add(friendInfo);
+                }
+
+                foreach (var subscriber in user.FriendRequestToMe)
+                {
+                    FriendInfo friendInfo = new FriendInfo
+                    {
+                        Email = subscriber.Subscriber.Email,
+                        Name = subscriber.Subscriber.Nickname,
+                        Icon = subscriber.Subscriber.Image,
+                        Status = FriendStatus.Subscriber,
+                        NumberPointsInRatingDepartment = subscriber.Subscriber.Rating,
+                        PlaceInRatingDepartment = 0
+                    };
+                    friendsAndSubscribers.Add(friendInfo);
+                }
+
+                foreach (var author in user.FriendRequestFromMe)
+                {
+                    FriendInfo friendInfo = new FriendInfo
+                    {
+                        Email = author.User.Email,
+                        Name = author.User.Nickname,
+                        Icon = author.User.Image,
+                        Status = FriendStatus.ApplicationSent,
+                        NumberPointsInRatingDepartment = author.User.Rating,
+                        PlaceInRatingDepartment = 0
+                    };
+                    friendsAndSubscribers.Add(friendInfo);
+                }
+
+                var userRating = _context.Users
+                    .OrderByDescending(u => u.Rating)
+                    .Select(u => new
+                {
+                    u.Email,
+                    u.Rating,
+                }).ToList();
+
+                friendsAndSubscribers = friendsAndSubscribers.OrderByDescending(f => f.NumberPointsInRatingDepartment).ToList();
+
+                int placeInDepartment = 1;
+                int currentIndexOfUserRating = 0;
+                foreach(var u in userRating)
+                {
+                    if(u.Email == friendsAndSubscribers[currentIndexOfUserRating].Email)
+                    {
+                        friendsAndSubscribers[currentIndexOfUserRating].PlaceInRatingDepartment = placeInDepartment;
+                        currentIndexOfUserRating++;
+
+                        if (currentIndexOfUserRating == friendsAndSubscribers.Count)
+                            return friendsAndSubscribers;
+                    }
+
+                    placeInDepartment++;
+                }
+
+            }
+
+            return friendsAndSubscribers;
+        }
+
+        /*
+         * Будущий я, прости за эту хню,
+         * Не учитывает, что является частью рейтинга => проблемы со статусом
+         */
+        public async Task<IEnumerable<UserInfo>> GetUsers(long id, string nicknamePattern)
+        {
+            List<UserInfo> users = new List<UserInfo>();
+            User? user = await GetFullAsync(id);
+
+
+            if (user != null)
+            {
+                var playersByRating = _context.Users.
+                        Where(u => EF.Functions.Like(u.Nickname, $"%{nicknamePattern}%"))
+                        .OrderByDescending(u => u.Rating);
+
+                if(playersByRating.Count() > 0)
+                {
+                    foreach(var player in playersByRating)
+                    {
+                        Friends? friendAcceptedMe = user.FriendsAcceptedMe.FirstOrDefault(u => u.UserId == player.Id);
+                        if(friendAcceptedMe != null)
+                        {
+                            UserInfo userInfo = new UserInfo
+                            {
+                                Email = friendAcceptedMe.User.Email,
+                                Icon = friendAcceptedMe.User.Email,
+                                Name = friendAcceptedMe.User.Nickname,
+                                Status = UserStatus.Friend,
+                                NumberPointsInRatingDepartment = friendAcceptedMe.User.Rating,
+                                PlaceInRatingDepartment = 0
+                            };
+                            users.Add(userInfo);
+                            continue;
+                        }
+
+
+                        Friends? friendAcceptedByMe = user.FriendsAcceptedByMe.FirstOrDefault(u => u.FriendId == player.Id);
+                        if (friendAcceptedByMe != null)
+                        {
+                            UserInfo userInfo = new UserInfo
+                            {
+                                Email = friendAcceptedByMe.Friend.Email,
+                                Icon = friendAcceptedByMe.Friend.Email,
+                                Name = friendAcceptedByMe.Friend.Nickname,
+                                Status = UserStatus.Friend,
+                                NumberPointsInRatingDepartment = friendAcceptedByMe.Friend.Rating,
+                                PlaceInRatingDepartment = 0
+                            };
+                            users.Add(userInfo);
+                            continue;
+                        }
+
+                        FriendRequest? subscriber = user.FriendRequestToMe.FirstOrDefault(u => u.SubscriberId == player.Id);
+                        if (subscriber != null)
+                        {
+                            UserInfo userInfo = new UserInfo
+                            {
+                                Email = subscriber.Subscriber.Email,
+                                Icon = subscriber.Subscriber.Email,
+                                Name = subscriber.Subscriber.Nickname,
+                                Status = UserStatus.Subscriber,
+                                NumberPointsInRatingDepartment = subscriber.Subscriber.Rating,
+                                PlaceInRatingDepartment = 0
+                            };
+                            users.Add(userInfo);
+                            continue;
+                        }
+
+                        FriendRequest? applicationSent = user.FriendRequestFromMe.FirstOrDefault(u => u.UserId == player.Id);
+                        if (applicationSent != null)
+                        {
+                            UserInfo userInfo = new UserInfo
+                            {
+                                Email = applicationSent.User.Email,
+                                Icon = applicationSent.User.Email,
+                                Name = applicationSent.User.Nickname,
+                                Status = UserStatus.ApplicationSent,
+                                NumberPointsInRatingDepartment = applicationSent.User.Rating,
+                                PlaceInRatingDepartment = 0
+                            };
+                            users.Add(userInfo);
+                            continue;
+                        }
+
+                        UserInfo user_info = new UserInfo
+                        {
+                            Email = player.Email,
+                            Icon = player.Email,
+                            Name = player.Nickname,
+                            Status = UserStatus.NotFriends,
+                            NumberPointsInRatingDepartment = player.Rating,
+                            PlaceInRatingDepartment = 0
+                        };
+                        users.Add(user_info);
+                    }
+
+                    var userRating = _context.Users.OrderByDescending(e => e.Rating).Select(u => new
+                    {
+                        u.Email,
+                        u.Rating
+                    });
+                    users = users.OrderByDescending(u => u.NumberPointsInRatingDepartment).ToList();
+
+
+                    int placeInDepartment = 1;
+                    int currentIndexOfUserRating = 0;
+                    foreach (var u in userRating)
+                    {
+                        if(u.Email == users[currentIndexOfUserRating].Email)
+                        {
+                            users[currentIndexOfUserRating].PlaceInRatingDepartment = placeInDepartment;
+                            currentIndexOfUserRating++;
+
+                            if (currentIndexOfUserRating == users.Count)
+                                return users;
+                        }
+
+                        placeInDepartment++;
+                    }
+                }
+            }
+
+            return users;
+        }
     }
 
 
