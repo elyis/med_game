@@ -104,7 +104,7 @@ namespace med_game.src.Repository
             (
                 u => u.Email == login.Email
                 &&
-                u.Password == login.PasswordHash
+                u.Password == login.Password
             );
 
         public Task AddAchievementToEveryone(Achievement achievement)
@@ -600,6 +600,30 @@ namespace med_game.src.Repository
                 Achievements = user.Achievements.Select(a => a.ToAchievementBody()).ToList()
             };
             return profile;
+        }
+
+        public async Task<bool> UpdateImageAsync(long id, string filename)
+        {
+            User? user = await GetAsync(id);
+            if(user == null) 
+                return false;
+
+            filename = filename.Replace(".jpg", ".jpeg");
+            user.Image = filename;
+            _context.SaveChanges();
+            return true;
+        }
+
+        public async Task<bool> UpdateImageAsync(string email, string filename)
+        {
+            User? user = await GetAsync(email);
+            if(user == null) 
+                return false;
+
+            filename = filename.Replace(".jpg", ".jpeg");
+            user.Image = filename;
+            _context.SaveChanges();
+            return true;
         }
     }
 

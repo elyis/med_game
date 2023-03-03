@@ -21,6 +21,8 @@ namespace med_game.src.Core.IRepository
 
         Task<bool> UpdateTokenAsync(string refreshTokenHash, long id);
         Task<bool> UpdateTokenAsync(string refreshToken, string email);
+        Task<bool> UpdateImageAsync(long id, string filename);
+        Task<bool> UpdateImageAsync(string email, string filename);
 
         Task<User?> LoginAsync(Login login);
         Task AddAchievementToEveryone(Achievement achievement);

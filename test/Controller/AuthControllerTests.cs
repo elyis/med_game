@@ -41,7 +41,7 @@ namespace test.Controller
             Login login = new Login
             {
                 Email = "testy@ss",
-                PasswordHash = "success"
+                Password = "success"
             };
 
             AuthController authController = new AuthController();
@@ -60,7 +60,7 @@ namespace test.Controller
             Login login = new Login
             {
                 Email = "testy@ss",
-                PasswordHash = "failed"
+                Password = "failed"
             };
 
             AuthController authController = new AuthController();

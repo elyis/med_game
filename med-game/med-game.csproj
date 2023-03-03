@@ -10,6 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Storages\**" />
+    <Content Remove="wwwroot\Storages\**" />
+    <EmbeddedResource Remove="wwwroot\Storages\**" />
+    <None Remove="wwwroot\Storages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.2" />
@@ -31,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Storages\ProfileIcons\" />
+    <Folder Include="src\Resources\Storages\ProfileIcons\" />
   </ItemGroup>
 
 </Project>
