@@ -565,6 +565,42 @@ namespace med_game.src.Repository
 
             return users;
         }
+
+        public async Task<ProfileBody?> GetProfileAsync(long id)
+        {
+            User? user = await _context.Users
+                .Include(u => u.Achievements)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            if(user == null) 
+                return null;
+
+            ProfileBody profile = new ProfileBody 
+            { 
+                Nickname = user.Nickname, 
+                Email = user.Email, 
+                UrlIcon = user.Image, 
+                Achievements = user.Achievements.Select(a => a.ToAchievementBody()).ToList() 
+            };
+            return profile;
+        }
+
+        public async Task<ProfileBody?> GetProfileAsync(string email)
+        {
+            User? user = await _context.Users
+                .Include(u => u.Achievements)
+                .FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return null;
+
+            ProfileBody profile = new ProfileBody
+            {
+                Nickname = user.Nickname,
+                Email = user.Email,
+                UrlIcon = user.Image,
+                Achievements = user.Achievements.Select(a => a.ToAchievementBody()).ToList()
+            };
+            return profile;
+        }
     }
 
 

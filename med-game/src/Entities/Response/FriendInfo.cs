@@ -26,5 +26,4 @@ namespace med_game.src.Entities.Response
         ApplicationSent,
         Subscriber
     }
-
 }

@@ -3,7 +3,6 @@ using med_game.src.Entities.Request;
 using med_game.src.Entities.Response;
 using med_game.src.models;
 using med_game.src.Models;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace med_game.src.Core.IRepository
 {
@@ -46,5 +45,7 @@ namespace med_game.src.Core.IRepository
         Task<IEnumerable<FriendInfo>> GetFriendsAndSubscibersInfo(long id);
         Task<IEnumerable<UserInfo>> GetUsers(long id, string nicknamePattern);
 
+        Task<ProfileBody?> GetProfileAsync(long id);
+        Task<ProfileBody?> GetProfileAsync(string email);
     }
 }
