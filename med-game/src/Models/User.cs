@@ -1,4 +1,5 @@
 ﻿using med_game.Models;
+using med_game.src.Entities.Response;
 using med_game.src.models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -28,6 +29,54 @@ namespace med_game.src.Models
         public List<Friends> FriendsAcceptedByMe { get; set; } = new();
         public List<FriendRequest> FriendRequestToMe { get; set; } = new();
         public List<FriendRequest> FriendRequestFromMe { get; set; } = new();
+
+        public RatingInfo ToRatingInfo()
+        {
+            return new RatingInfo
+            {
+                Mail = Email,
+                Rating = Rating,
+                Image = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
+                Nickname = Nickname
+            };
+        }
+
+        public ProfileBody ToProfileBody()
+        {
+            return new ProfileBody
+            {
+                Nickname = Nickname,
+                Email = Email,
+                UrlIcon = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
+                Achievements = Achievements.Select(a => a.ToAchievementBody()).ToList()
+            };
+        }
+
+        public UserInfo ToUserInfo(UserStatus status)
+        {
+            return new UserInfo
+            {
+                Email = Email,
+                Icon = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
+                Name = Nickname,
+                Status = status,
+                NumberPointsInRatingDepartment = Rating,
+                PlaceInRatingDepartment = 0
+            };
+        }
+
+        public FriendInfo ToFriendInfo(FriendStatus status)
+        {
+            return new FriendInfo
+            {
+                Email = Email,
+                Icon = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
+                Name = Nickname,
+                Status = status,
+                NumberPointsInRatingDepartment = Rating,
+                PlaceInRatingDepartment = 0
+            };
+        }
     }
 
 

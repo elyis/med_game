@@ -27,7 +27,7 @@ namespace med_game.src.Utility
             {
                 using Stream fileStream = File.OpenRead(fullPathToFile);
                 var memoryStream = new MemoryStream();
-                fileStream.CopyTo(memoryStream);
+                await fileStream.CopyToAsync(memoryStream);
                 return memoryStream.ToArray();
             }
             return null;

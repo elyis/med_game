@@ -6,7 +6,7 @@ using med_game.src.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Net.Mime;
+
 
 namespace med_game.src.Controllers
 {
@@ -24,45 +24,44 @@ namespace med_game.src.Controllers
             "image/png",
         };
 
-        private readonly string pathToProfileIcons = @"C:\Users\su\source\repos\med-game\med-game\src\Resources\Storages\ProfileIcons\";
 
         public ProfileController()
         {
             AppDbContext context = new AppDbContext();
             _userRepository = new UserRepository(context);
             _fileUploader = new FileUploader();
-            _jwtUtilities = new JwtUtilities(); 
+            _jwtUtilities = new JwtUtilities();
         }
 
 
 
         [HttpPost("profileIcon")]
         [Authorize]
-        [ProducesResponseType((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.UnsupportedMediaType)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.UnsupportedMediaType)]
 
         public async Task<IActionResult> UploadProfileIcon()
         {
             string? contentType = Request.Headers.ContentType;
             if (contentType != null && _validFileFormats.Contains(contentType!))
             {
-                var filename = await _fileUploader.UploadImage(pathToProfileIcons, Request.Body, contentType!.Split('/').Last());
-                if (filename == null) 
-                    return Unauthorized();
-
                 string token = Request.Headers.Authorization!;
                 string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
 
                 if (!long.TryParse(userIdClaim, out long userId))
                     return Unauthorized();
 
+                var filename = await _fileUploader.UploadImage(Constants.pathToProfileIcons, Request.Body, contentType!.Split('/').Last());
+                if (filename == null)
+                    return BadRequest();
+
                 var isUpdate = await _userRepository.UpdateImageAsync(userId, filename);
                 if (!isUpdate)
                     return Unauthorized();
                 return Ok(filename);
             }
-            
+
             return new UnsupportedMediaTypeResult();
         }
 
@@ -70,7 +69,7 @@ namespace med_game.src.Controllers
 
         [HttpGet("profile")]
         [Authorize]
-        [ProducesResponseType(typeof(ProfileBody), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProfileBody), (int)HttpStatusCode.OK)]
 
         public async Task<IActionResult> GetProfile()
         {
@@ -87,13 +86,13 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("profileIcon/{filename}")]
-        [ProducesResponseType(typeof(File), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(File), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
 
         public async Task<IActionResult> GetProfileImage(string filename)
-        {   
-            var bytes = await _fileUploader.GetStreamImage(pathToProfileIcons, filename);
-            if(bytes == null)
+        {
+            var bytes = await _fileUploader.GetStreamImage(Constants.pathToProfileIcons, filename);
+            if (bytes == null)
                 return NotFound();
 
             string extension = filename.Split('.').Last();

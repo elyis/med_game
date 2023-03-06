@@ -84,25 +84,5 @@ namespace med_game.src.Controllers
             await Response.WriteAsJsonAsync(result);
         }
 
-
-
-        [HttpGet("players/{pattern}")]
-        [Authorize]
-        [ProducesResponseType(typeof(List<UserInfo>), (int) HttpStatusCode.OK)]
-
-        public async Task GetPlayersByPattern(string pattern)
-        {
-            string token = Request.Headers.Authorization!;
-            string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
-
-            if (!long.TryParse(userIdClaim, out long userId))
-            {
-                Response.StatusCode = 401;
-                return;
-            }
-
-            var result = await _userRepository.GetUsers(userId,pattern);
-            await Response.WriteAsJsonAsync(result);
-        }
     }
 }

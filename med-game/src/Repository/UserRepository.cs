@@ -355,57 +355,25 @@ namespace med_game.src.Repository
 
                 foreach(var friend in user.FriendsAcceptedMe)
                 {
-                    FriendInfo friendInfo = new FriendInfo
-                    {
-                        Email = friend.User.Email,
-                        Name = friend.User.Nickname,
-                        Icon = friend.User.Image,
-                        Status = FriendStatus.Friend,
-                        NumberPointsInRatingDepartment = friend.User.Rating,
-                        PlaceInRatingDepartment = 0
-                    };
+                    FriendInfo friendInfo = friend.User.ToFriendInfo(FriendStatus.Friend);
                     friendsAndSubscribers.Add(friendInfo);
                 }
 
                 foreach (var friend in user.FriendsAcceptedByMe)
                 {
-                    FriendInfo friendInfo = new FriendInfo
-                    {
-                        Email = friend.Friend.Email,
-                        Name = friend.Friend.Nickname,
-                        Icon = friend.Friend.Image,
-                        Status = FriendStatus.Friend,
-                        NumberPointsInRatingDepartment = friend.Friend.Rating,
-                        PlaceInRatingDepartment = 0
-                    };
+                    FriendInfo friendInfo = friend.Friend.ToFriendInfo(FriendStatus.Friend);
                     friendsAndSubscribers.Add(friendInfo);
                 }
 
                 foreach (var subscriber in user.FriendRequestToMe)
                 {
-                    FriendInfo friendInfo = new FriendInfo
-                    {
-                        Email = subscriber.Subscriber.Email,
-                        Name = subscriber.Subscriber.Nickname,
-                        Icon = subscriber.Subscriber.Image,
-                        Status = FriendStatus.Subscriber,
-                        NumberPointsInRatingDepartment = subscriber.Subscriber.Rating,
-                        PlaceInRatingDepartment = 0
-                    };
+                    FriendInfo friendInfo = subscriber.Subscriber.ToFriendInfo(FriendStatus.Subscriber);
                     friendsAndSubscribers.Add(friendInfo);
                 }
 
                 foreach (var author in user.FriendRequestFromMe)
                 {
-                    FriendInfo friendInfo = new FriendInfo
-                    {
-                        Email = author.User.Email,
-                        Name = author.User.Nickname,
-                        Icon = author.User.Image,
-                        Status = FriendStatus.ApplicationSent,
-                        NumberPointsInRatingDepartment = author.User.Rating,
-                        PlaceInRatingDepartment = 0
-                    };
+                    FriendInfo friendInfo = author.User.ToFriendInfo(FriendStatus.ApplicationSent);
                     friendsAndSubscribers.Add(friendInfo);
                 }
 
@@ -463,15 +431,7 @@ namespace med_game.src.Repository
                         Friends? friendAcceptedMe = user.FriendsAcceptedMe.FirstOrDefault(u => u.UserId == player.Id);
                         if(friendAcceptedMe != null)
                         {
-                            UserInfo userInfo = new UserInfo
-                            {
-                                Email = friendAcceptedMe.User.Email,
-                                Icon = friendAcceptedMe.User.Email,
-                                Name = friendAcceptedMe.User.Nickname,
-                                Status = UserStatus.Friend,
-                                NumberPointsInRatingDepartment = friendAcceptedMe.User.Rating,
-                                PlaceInRatingDepartment = 0
-                            };
+                            UserInfo userInfo = friendAcceptedMe.User.ToUserInfo(UserStatus.Friend);
                             users.Add(userInfo);
                             continue;
                         }
@@ -480,15 +440,7 @@ namespace med_game.src.Repository
                         Friends? friendAcceptedByMe = user.FriendsAcceptedByMe.FirstOrDefault(u => u.FriendId == player.Id);
                         if (friendAcceptedByMe != null)
                         {
-                            UserInfo userInfo = new UserInfo
-                            {
-                                Email = friendAcceptedByMe.Friend.Email,
-                                Icon = friendAcceptedByMe.Friend.Email,
-                                Name = friendAcceptedByMe.Friend.Nickname,
-                                Status = UserStatus.Friend,
-                                NumberPointsInRatingDepartment = friendAcceptedByMe.Friend.Rating,
-                                PlaceInRatingDepartment = 0
-                            };
+                            UserInfo userInfo = friendAcceptedByMe.Friend.ToUserInfo(UserStatus.Friend);
                             users.Add(userInfo);
                             continue;
                         }
@@ -496,15 +448,7 @@ namespace med_game.src.Repository
                         FriendRequest? subscriber = user.FriendRequestToMe.FirstOrDefault(u => u.SubscriberId == player.Id);
                         if (subscriber != null)
                         {
-                            UserInfo userInfo = new UserInfo
-                            {
-                                Email = subscriber.Subscriber.Email,
-                                Icon = subscriber.Subscriber.Email,
-                                Name = subscriber.Subscriber.Nickname,
-                                Status = UserStatus.Subscriber,
-                                NumberPointsInRatingDepartment = subscriber.Subscriber.Rating,
-                                PlaceInRatingDepartment = 0
-                            };
+                            UserInfo userInfo = subscriber.Subscriber.ToUserInfo(UserStatus.Subscriber);
                             users.Add(userInfo);
                             continue;
                         }
@@ -512,28 +456,11 @@ namespace med_game.src.Repository
                         FriendRequest? applicationSent = user.FriendRequestFromMe.FirstOrDefault(u => u.UserId == player.Id);
                         if (applicationSent != null)
                         {
-                            UserInfo userInfo = new UserInfo
-                            {
-                                Email = applicationSent.User.Email,
-                                Icon = applicationSent.User.Email,
-                                Name = applicationSent.User.Nickname,
-                                Status = UserStatus.ApplicationSent,
-                                NumberPointsInRatingDepartment = applicationSent.User.Rating,
-                                PlaceInRatingDepartment = 0
-                            };
+                            UserInfo userInfo = applicationSent.User.ToUserInfo(UserStatus.ApplicationSent);
                             users.Add(userInfo);
                             continue;
                         }
-
-                        UserInfo user_info = new UserInfo
-                        {
-                            Email = player.Email,
-                            Icon = player.Email,
-                            Name = player.Nickname,
-                            Status = UserStatus.NotFriends,
-                            NumberPointsInRatingDepartment = player.Rating,
-                            PlaceInRatingDepartment = 0
-                        };
+                        UserInfo user_info = player.ToUserInfo(UserStatus.NotFriends);
                         users.Add(user_info);
                     }
 
@@ -571,17 +498,8 @@ namespace med_game.src.Repository
             User? user = await _context.Users
                 .Include(u => u.Achievements)
                 .FirstOrDefaultAsync(u => u.Id == id);
-            if(user == null) 
-                return null;
 
-            ProfileBody profile = new ProfileBody 
-            { 
-                Nickname = user.Nickname, 
-                Email = user.Email, 
-                UrlIcon = user.Image, 
-                Achievements = user.Achievements.Select(a => a.ToAchievementBody()).ToList() 
-            };
-            return profile;
+            return user == null ? null : user.ToProfileBody();
         }
 
         public async Task<ProfileBody?> GetProfileAsync(string email)
@@ -589,17 +507,8 @@ namespace med_game.src.Repository
             User? user = await _context.Users
                 .Include(u => u.Achievements)
                 .FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null)
-                return null;
 
-            ProfileBody profile = new ProfileBody
-            {
-                Nickname = user.Nickname,
-                Email = user.Email,
-                UrlIcon = user.Image,
-                Achievements = user.Achievements.Select(a => a.ToAchievementBody()).ToList()
-            };
-            return profile;
+            return user == null ? null : user.ToProfileBody();
         }
 
         public async Task<bool> UpdateImageAsync(long id, string filename)
@@ -624,6 +533,12 @@ namespace med_game.src.Repository
             user.Image = filename;
             _context.SaveChanges();
             return true;
+        }
+
+        public IEnumerable<RatingInfo> GetRatingInfo()
+        {
+            var ratingTable = _context.Users.OrderByDescending(u => u.Rating).Select(u => u.ToRatingInfo());
+            return ratingTable;
         }
     }
 
