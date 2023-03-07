@@ -53,7 +53,6 @@ namespace med_game
             {
                 options.IdleTimeout = TimeSpan.Zero;
             });
-
         }
 
         public void Configure(WebApplication app, IWebHostEnvironment env)

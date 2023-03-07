@@ -2,20 +2,20 @@
 using med_game.src.Core.IService;
 using med_game.src.Entities.Request;
 using med_game.src.Entities;
-using med_game.src.Managers;
 using System.Security.Claims;
 using med_game.src.Models;
 using med_game.src.Utility;
+using med_game.src.Core.IManager;
 
 namespace med_game.src.Service
 {
     public class AuthService : IAuthService
     {
-        private readonly JwtManager _jwtManager;
+        private readonly IJwtManager _jwtManager;
         private readonly JwtUtilities _jwtUtilities;
         private readonly IUserRepository _userRepository;
 
-        public AuthService(JwtManager jwtManager, IUserRepository userRepository)
+        public AuthService(IJwtManager jwtManager, IUserRepository userRepository)
         {
             _jwtUtilities = new JwtUtilities();
             _jwtManager = jwtManager;

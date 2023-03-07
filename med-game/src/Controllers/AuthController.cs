@@ -10,6 +10,7 @@ using System.Net;
 using med_game.src.Core.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using med_game.src.Models;
+using med_game.src.Core.IManager;
 
 namespace med_game.src.Controllers
 {
@@ -18,7 +19,7 @@ namespace med_game.src.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly JwtManager _jwtManager;
+        private readonly IJwtManager _jwtManager;
         private readonly IUserRepository _userRepository;
 
         public AuthController()

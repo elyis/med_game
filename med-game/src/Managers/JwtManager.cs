@@ -1,4 +1,5 @@
-﻿using med_game.src.Entities;
+﻿using med_game.src.Core.IManager;
+using med_game.src.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace med_game.src.Managers
 {
-    public class JwtManager
+    public class JwtManager : IJwtManager
     {
         private readonly string key;
         private readonly SigningCredentials _signingCredentials;
