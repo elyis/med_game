@@ -16,15 +16,12 @@ namespace med_game.src.Managers
 
         public static GameLobbyManager GetInstance()
         {
-            if (_instance == null)
-                _instance = new GameLobbyManager();
+            _instance ??= new GameLobbyManager();
             return _instance;
         }
 
         public static bool AddWebSocket(long userId, WebSocket webSocket)
-        {
-            return _sockets.TryAdd(userId, webSocket);
-        }
+            => _sockets.TryAdd(userId, webSocket);
 
 
     }
