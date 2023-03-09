@@ -6,8 +6,6 @@ using med_game.src.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace med_game.src.Controllers
 {

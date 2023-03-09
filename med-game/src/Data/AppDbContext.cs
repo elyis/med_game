@@ -19,6 +19,7 @@ namespace med_game.src.Data
             var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
             var connectionString = config.GetConnectionString("DefaultConnection");
             optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.EnableSensitiveDataLogging();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -10,7 +10,7 @@ namespace test.Controller
     public class AuthControllerTests
     {
         [Fact]
-        public async void SuccessfulRegisterUser()
+        public async Task SuccessfulRegisterUser()
         {   
             RegistrationBody registrationBody = new RegistrationBody 
             { 
@@ -36,7 +36,7 @@ namespace test.Controller
         [Fact]
         public async Task<TokenPair> SuccessfulLogin()
         {
-            SuccessfulRegisterUser();
+            await SuccessfulRegisterUser();
 
             Login login = new Login
             {
@@ -53,9 +53,9 @@ namespace test.Controller
         }
 
         [Fact]
-        public async void FailedLogin()
+        public async Task FailedLogin()
         {
-            SuccessfulRegisterUser();
+            await SuccessfulRegisterUser();
 
             Login login = new Login
             {
@@ -83,6 +83,5 @@ namespace test.Controller
             Assert.Equal((int)HttpStatusCode.OK, (int)result.StatusCode!);
             return (TokenPair) result.Value!;
         }
-
     }
 }
