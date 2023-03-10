@@ -39,14 +39,14 @@ namespace med_game.src.Controllers
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
+                string token = Request.Headers.Authorization!;
+                string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
+
+                if (!long.TryParse(userIdClaim, out long userId))
+                    return;
+
                 try
                 {
-                    string token = Request.Headers.Authorization!;
-                    string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
-
-                    if (!long.TryParse(userIdClaim, out long userId))
-                        return;
-
                     RoomSettingBody roomSettingBody = await ReceiveRoomSettingJsonAsync(webSocket);
                     Lectern? lectern = await _lecternRepository.GetAsync(roomSettingBody.LecternName);
                     Module? module = null;
@@ -74,13 +74,13 @@ namespace med_game.src.Controllers
                     };
 
                     GameLobbyManager gameLobbyManager = GameLobbyManager.GetInstance();
-                    if (!gameLobbyManager.AddConnection(userId, connection))
+                    if (!GameLobbyManager.AddConnection(userId, connection))
                         return;
 
                     string? roomId = null;
                     while(webSocket.CloseStatus == null && roomId == null)
                     {
-                        roomId = await gameLobbyManager.GetLobbyId(userId, roomSettings);
+                        roomId = await GameLobbyManager.GetLobbyId(userId, roomSettings);
                         await Task.Delay(1000);
                     }
                 }
@@ -95,7 +95,8 @@ namespace med_game.src.Controllers
                 }
                 finally
                 {
-                    if(webSocket.CloseStatus == null)
+                    GameLobbyManager.RemoveConnection(userId);
+                    if (webSocket.CloseStatus == null)
                         await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
                 }
             }

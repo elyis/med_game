@@ -11,7 +11,7 @@ Console.ReadLine();
 
 Stopwatch stopwatch = new Stopwatch();
 stopwatch.Start();
-var gameLobby = new GameLobbyDistributorTesting(4);
+var gameLobby = new GameLobbyDistributorTesting(100);
 await gameLobby.Execute();
 
 stopwatch.Stop();
@@ -30,7 +30,8 @@ class GameLobbyDistributorTesting
     private readonly List<string> _accessTokens = new List<string>();
     private readonly List<(string email, string roomId)> _results = new List<(string email, string roomId)>();
     private readonly RoomSettingBody _roomSettingBody;
-    private readonly Uri uri = new Uri("wss://localhost:7296/main");
+    private readonly Uri uri = new Uri("wss://localhost:44335/main");
+    private readonly List<Task<(string, string)>> _tasks = new ();
 
     private readonly List<ClientWebSocket> _clients = new List<ClientWebSocket>();
 
@@ -57,7 +58,9 @@ class GameLobbyDistributorTesting
         await SendAll(json);
         await ReceiveRoomId();
 
-        foreach (var result in _results)
+        Console.WriteLine(_results.DistinctBy(e => e.roomId).Count());
+
+        foreach (var result in _results.DistinctBy(e => e.roomId))
         {
             Console.WriteLine(result);
         }
@@ -118,22 +121,31 @@ class GameLobbyDistributorTesting
             if(client.CloseStatus == null)
             {
                 await client.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, CancellationToken.None);
-                Console.WriteLine("send");
             }
         }
+    }
+
+    private async Task<(string, string)> ReceiveRoomId(ClientWebSocket client, string email)
+    {
+        byte[] bytes = new byte[2048];
+        var result = await client.ReceiveAsync(bytes, CancellationToken.None);
+        string message = Encoding.UTF8.GetString(bytes);
+        return (email, message);
+
     }
 
     private async Task ReceiveRoomId()
     {
         foreach(var login in _logins.Select((value, index) => new {value, index}))
         {
-            Console.WriteLine($"{login.value.Email} start receive");
             byte[] bytes = new byte[2048];
-            await _clients[login.index].ReceiveAsync(bytes, CancellationToken.None);
-            await _clients[login.index].CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
 
-            string roomId = Encoding.UTF8.GetString(bytes);
-            _results.Add((login.value.Email, roomId));
+            _tasks.Add(ReceiveRoomId(_clients[login.index], login.value.Email));
+        }
+        
+        foreach(var task in _tasks)
+        {
+            _results.Add(task.Result);
         }
     }
 }

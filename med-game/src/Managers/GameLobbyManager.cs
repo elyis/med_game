@@ -21,13 +21,14 @@ namespace med_game.src.Managers
             return _instance;
         }
 
-        public bool AddConnection(long userId, Connection connection)
+        public static bool AddConnection(long userId, Connection connection)
             => _connections.TryAdd(userId, connection);
 
-        public bool RemoveConnection(long userId)
+        public static bool RemoveConnection(long userId)
             => _connections.TryRemove(userId, out var connection);
 
-        public async Task<string?> GetLobbyId(long userId, RoomSettings roomSettings)
+
+        public static async Task<string?> GetLobbyId(long userId, RoomSettings roomSettings)
         {
             if(Interlocked.CompareExchange(ref isLocked,1,0) == 0)
             {
@@ -63,7 +64,8 @@ namespace med_game.src.Managers
             return null;
         }
 
-        private async Task SendAll(string message, long[] userIds)
+
+        private static async Task SendAll(string message, long[] userIds)
         {
             foreach(var userId in userIds)
             {
@@ -72,13 +74,13 @@ namespace med_game.src.Managers
             }
         }
 
-        private async Task CloseAndRemoveAll(long[] userIds)
+
+        private static async Task CloseAndRemoveAll(long[] userIds)
         {
             foreach (var userId in userIds)
             {
                 if (_connections[userId].WebSocket.CloseStatus == null)
-                    await _connections[userId].WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
-                _connections.TryRemove(userId, out _);
+                    _connections[userId].WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
             }
         }
     }
