@@ -11,7 +11,7 @@ Console.ReadLine();
 
 Stopwatch stopwatch = new Stopwatch();
 stopwatch.Start();
-var gameLobby = new GameLobbyDistributorTesting(100);
+var gameLobby = new GameLobbyDistributorTesting(400);
 await gameLobby.Execute();
 
 stopwatch.Stop();
@@ -52,17 +52,25 @@ class GameLobbyDistributorTesting
 
     public async Task Execute()
     {
-        await GetTokens();
-        await GenerateClients();
-        string json = JsonConvert.SerializeObject(_roomSettingBody);
-        await SendAll(json);
-        await ReceiveRoomId();
-
-        Console.WriteLine(_results.DistinctBy(e => e.roomId).Count());
-
-        foreach (var result in _results.DistinctBy(e => e.roomId))
+        try
         {
-            Console.WriteLine(result);
+            await GetTokens();
+            await GenerateClients();
+            string json = JsonConvert.SerializeObject(_roomSettingBody);
+            await SendAll(json);
+            await ReceiveRoomId();
+            await ReceiveCloseFrame();
+
+            Console.WriteLine(_results.DistinctBy(e => e.roomId).Count());
+
+            foreach (var result in _results.DistinctBy(e => e.roomId))
+            {
+                Console.WriteLine(result);
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
     }
 
@@ -131,7 +139,6 @@ class GameLobbyDistributorTesting
         var result = await client.ReceiveAsync(bytes, CancellationToken.None);
         string message = Encoding.UTF8.GetString(bytes);
         return (email, message);
-
     }
 
     private async Task ReceiveRoomId()
@@ -146,6 +153,14 @@ class GameLobbyDistributorTesting
         foreach(var task in _tasks)
         {
             _results.Add(task.Result);
+        }
+    }
+
+    private async Task ReceiveCloseFrame()
+    {
+        foreach(var client in _clients)
+        {
+            await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
         }
     }
 }

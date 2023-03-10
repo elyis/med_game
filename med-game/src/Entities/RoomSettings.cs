@@ -7,6 +7,7 @@ namespace med_game.src.Entities
         public int LecternId { get; set; }
         public int? ModuleId { get; set; }
         public TypeBattle Type { get; set; }
+        public int CountPlayers { get; set; }
 
         public bool Equals(RoomSettings roomSettings)
         {

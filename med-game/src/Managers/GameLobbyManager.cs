@@ -3,23 +3,13 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 
+
 namespace med_game.src.Managers
 {
-    public class GameLobbyManager
+    public static class GameLobbyManager
     {
         private static readonly ConcurrentDictionary<long, Connection> _connections = new();
-        private static GameLobbyManager? _instance;
         private static int isLocked = 0;
-
-        private GameLobbyManager()
-        {
-        }
-
-        public static GameLobbyManager GetInstance()
-        {
-            _instance ??= new GameLobbyManager();
-            return _instance;
-        }
 
         public static bool AddConnection(long userId, Connection connection)
             => _connections.TryAdd(userId, connection);
@@ -45,18 +35,19 @@ namespace med_game.src.Managers
 
                     Interlocked.Exchange(ref _connections[enemy.Key].IsEnemyFound, 1);
 
-                    string roomId = Guid.NewGuid().ToString();
+                    GamingLobby lobby = new GamingLobby(roomSettings);
+                    
                     long[] userIds = new long[]
                     {
                         userId,
                         enemy.Key
                     };
 
-                    await SendAll(roomId, userIds);
+                    await SendAll(lobby.Id, userIds);
                     await CloseAndRemoveAll(userIds);
 
                     Interlocked.Exchange(ref isLocked, 0);
-                    return roomId;
+                    return lobby.Id;
                 }
 
                 Interlocked.Exchange(ref isLocked,0);
@@ -79,8 +70,8 @@ namespace med_game.src.Managers
         {
             foreach (var userId in userIds)
             {
-                if (_connections[userId].WebSocket.CloseStatus == null)
-                    _connections[userId].WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                if (_connections[userId].WebSocket.State == WebSocketState.Open)
+                    await _connections[userId].WebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
             }
         }
     }

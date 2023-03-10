@@ -73,7 +73,7 @@ namespace med_game
             app.MapControllers();
             app.UseWebSockets(new WebSocketOptions
             {
-                KeepAliveInterval = TimeSpan.FromSeconds(20),
+                KeepAliveInterval = TimeSpan.FromSeconds(5),
             });
             
 

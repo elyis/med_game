@@ -19,6 +19,5 @@ namespace med_game.src.Utility
             GetClaimsFromJwt(token)
                 .FirstOrDefault(claim => claim.Type == "UserId")
                 ?.Value;
-       
     }
 }
