@@ -1,6 +1,4 @@
-﻿using med_game.src.Controllers;
-using med_game.src.Entities.Request;
-
+﻿using System.Net.WebSockets;
 using Xunit;
 
 namespace test.Controller
@@ -10,24 +8,10 @@ namespace test.Controller
         [Fact]
         public async Task LobbyDistributorTesting()
         {
-            List<RegistrationBody> registrations = new List<RegistrationBody>();
-            List<AuthController> authControllers = new List<AuthController>();
-            int countUsers = 100;
-            int countThreads = 6;
+            using var ws = new ClientWebSocket();
+            Uri uri = new Uri("wss://localhost:7296/main");
 
-            for(int i = 0; i < countUsers; i++)
-            {
-                registrations.Add(
-                        new RegistrationBody { Email = "testy@" + i, Nickname = "testy" + i, Password = "password" }
-                    );
-                authControllers.Add(new AuthController());
-            }
-            
-
-
-
+            await ws.ConnectAsync(uri, CancellationToken.None);
         }
-
-
     }
 }

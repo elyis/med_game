@@ -5,7 +5,9 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "med-game", "med-game\med-game.csproj", "{5931A8E2-6C36-44A6-BD6F-B5F51553D38B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{8C0C593D-F8BB-4185-94F1-8ECCD848F637}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "test\test.csproj", "{8C0C593D-F8BB-4185-94F1-8ECCD848F637}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "websocketTest", "websocketTest\websocketTest.csproj", "{729C012E-8DCC-46D8-976D-1DE41FD2A992}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{8C0C593D-F8BB-4185-94F1-8ECCD848F637}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C0C593D-F8BB-4185-94F1-8ECCD848F637}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C0C593D-F8BB-4185-94F1-8ECCD848F637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{729C012E-8DCC-46D8-976D-1DE41FD2A992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{729C012E-8DCC-46D8-976D-1DE41FD2A992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{729C012E-8DCC-46D8-976D-1DE41FD2A992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{729C012E-8DCC-46D8-976D-1DE41FD2A992}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

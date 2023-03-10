@@ -75,6 +75,7 @@ namespace med_game
             {
                 KeepAliveInterval = TimeSpan.FromSeconds(20),
             });
+            
 
             //InitDb();
 
