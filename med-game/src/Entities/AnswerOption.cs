@@ -12,7 +12,7 @@ namespace med_game.src.Entities
         {
             if( answerOption.Type == Type && 
                 answerOption.Image == Image && 
-                answerOption.Text == Text
+                answerOption.Text?.ToLower() == Text?.ToLower()
                 ) 
                 return true;
             return false;

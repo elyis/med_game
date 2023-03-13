@@ -84,6 +84,7 @@ namespace med_game.src.Repository
                 {
                     var questions = _context.Questions
                         .Where(q => q.Module.Id == moduleId)
+                        .Include(q => q.Answers)
                         .OrderBy(q => EF.Functions.Random())
                         .Take(countQuestions - result.Count);
 
@@ -94,7 +95,7 @@ namespace med_game.src.Repository
                 return result;
             }
 
-            Lectern lectern = _context.Lecterns.Include(l => l.Modules).ThenInclude(l => l.Questions).First(l => l.Id == lecternId);
+            Lectern lectern = _context.Lecterns.Include(l => l.Modules).ThenInclude(l => l.Questions).ThenInclude(q => q.Answers).First(l => l.Id == lecternId);
             if(lectern.Modules.Count == 0)
                 return null;
 

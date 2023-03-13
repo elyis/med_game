@@ -1,4 +1,5 @@
 ﻿using med_game.Models;
+using med_game.src.Entities;
 using med_game.src.Entities.Response;
 using med_game.src.models;
 using Microsoft.EntityFrameworkCore;
@@ -77,6 +78,16 @@ namespace med_game.src.Models
                 PlaceInRatingDepartment = 0
             };
         }
+
+        public GameStatisticInfo ToGameStatisticInfo()
+        {
+            return new GameStatisticInfo
+            {
+                Nickname = Nickname,
+                Image = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}"
+            };
+        }
+
     }
 
 

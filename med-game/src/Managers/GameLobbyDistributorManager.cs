@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using med_game.src.Data;
-
+using med_game.src.Models;
 
 namespace med_game.src.Managers
 {
@@ -11,6 +11,7 @@ namespace med_game.src.Managers
     {
         private static readonly ConcurrentDictionary<long, Connection> _connections = new();
         private static int isLocked = 0;
+        private static readonly AppDbContext _context = new AppDbContext();
 
         public static bool AddConnection(long userId, Connection connection)
             => _connections.TryAdd(userId, connection);
@@ -47,8 +48,11 @@ namespace med_game.src.Managers
                     if (!lobby.GenerateQuestion())
                         await CloseAll(userIds,"Module does not contain questions", WebSocketCloseStatus.InvalidPayloadData);
 
-                    lobby.AddPlayerId(userId);
-                    lobby.AddPlayerId(enemy.Key);
+                    User? user = await _context.Users.FindAsync(userId)!;
+                    User? enemyUser = await _context.Users.FindAsync(enemy.Key);
+
+                    lobby.AddPlayerInfo(userId, user?.ToGameStatisticInfo()!);
+                    lobby.AddPlayerInfo(enemy.Key, enemyUser?.ToGameStatisticInfo()!);
 
                     await SendAll(lobby.Id, userIds);
                     await CloseAll(userIds,"Lobby successfully created", WebSocketCloseStatus.NormalClosure);

@@ -6,6 +6,7 @@ using System.Text;
 using System.Net.WebSockets;
 using med_game.src.Utility;
 using med_game.src.Entities;
+using med_game.src.Entities.Response;
 
 namespace med_game.src.Controllers
 {
@@ -39,29 +40,56 @@ namespace med_game.src.Controllers
 
                 if (!GlobalVariables.GamingLobbies.ContainsKey(lobbyId))
                 {
-                    await webSocket.SendAsync(Encoding.UTF8.GetBytes("session isn't exist"), WebSocketMessageType.Text, true, CancellationToken.None);
-                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                    await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "session isn't exist", CancellationToken.None);
                     return;
                 }
 
-                if (!GlobalVariables.GamingLobbies[lobbyId].PlayerIds.Contains(userId))
+                if (!GlobalVariables.GamingLobbies[lobbyId].PlayerInfo.Keys.Contains(userId))
                 {
-                    await webSocket.SendAsync(Encoding.UTF8.GetBytes("player don't belong to this room"), WebSocketMessageType.Text, true, CancellationToken.None);
-                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                    await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "player don't belong to this room", CancellationToken.None);
                     return;
                 }
 
                 GamingLobby lobby = GlobalVariables.GamingLobbies[lobbyId];
-               
-                AnswerOption? rightAnswer = null;
-                WebSocketReceiveResult result = null;
-                GlobalVariables.GamingLobbies[lobbyId].AddPlayer(userId, webSocket);
-                if (GlobalVariables.GamingLobbies[lobbyId].Players.Count == GlobalVariables.GamingLobbies[lobbyId].PlayerIds.Count)
+                AnswerOption? playerAnswer = null;
+                WebSocketReceiveResult? result = null;
 
-                while (webSocket.State == WebSocketState.Open)
+
+                lobby.AddPlayer(userId, webSocket);
+                if (lobby.Players.Count == lobby.PlayerInfo.Count)
                 {
-                    await webSocket.SendAsync(Encoding.UTF8.GetBytes("session is exist"), WebSocketMessageType.Text, true, CancellationToken.None);
-                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                    if (Interlocked.CompareExchange(ref lobby.isLobbyManaged, 1, 0) == 0)
+                        await lobby.Start();
+                    else
+                        await Task.Delay(100);
+                }
+                
+                
+                try
+                {
+                    while (lobby.isLobbyRunning == 0)
+                        await Task.Delay(500);
+
+                    try
+                    {
+                        while (webSocket.State == WebSocketState.Open && lobby.isLobbyRunning == 1)
+                        {
+                            var answerOptions = await lobby.ReceiveJson<AnswerOption>(webSocket);
+
+                        }
+
+                    }catch(Exception ex)
+                    {
+
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+                finally
+                {
+
                 }
             }
             else
