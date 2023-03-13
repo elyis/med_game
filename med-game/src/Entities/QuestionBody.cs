@@ -18,7 +18,8 @@ namespace med_game.src.Entities
     public enum TypeQuestion
     {
         Image,
-        Text
+        Text,
+        Input,
     }
 
     public class QuestionProperties

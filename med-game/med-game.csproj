@@ -38,9 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Resources\Storages\AnswerIcons\" />
     <Folder Include="src\Resources\Storages\AchievementIcons\" />
-    <Folder Include="src\Resources\Storages\QuestionIcons\" />
     <Folder Include="src\Resources\Storages\ProfileIcons\" />
   </ItemGroup>
 

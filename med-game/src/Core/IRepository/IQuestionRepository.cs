@@ -11,5 +11,6 @@ namespace med_game.src.Core.IRepository
         Task<bool> DeleteAsync(long id);    
         Task<bool> DeleteAsync(QuestionProperties questionProperties, Module module);
         IEnumerable<Question> GetAllAsync();
+        List<Question>? GenerateRandomQuestions(int lecternId, int? moduleId, int countQuestions);
     }
 }

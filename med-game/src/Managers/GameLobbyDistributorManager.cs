@@ -2,11 +2,12 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
+using med_game.src.Data;
 
 
 namespace med_game.src.Managers
 {
-    public static class GameLobbyManager
+    public static class GameLobbyDistributorManager
     {
         private static readonly ConcurrentDictionary<long, Connection> _connections = new();
         private static int isLocked = 0;
@@ -28,23 +29,31 @@ namespace med_game.src.Managers
                                                             connection.Value.IsEnemyFound == 0 &&
                                                             connection.Value.RoomSettings.Equals(roomSettings));
                     if(enemy.Equals(default(KeyValuePair<long, Connection>))) {
-                        Interlocked.Exchange(ref isLocked, 0);
                         Interlocked.Exchange(ref _connections[userId].IsEnemyFound, 0);
+                        Interlocked.Exchange(ref isLocked, 0);
                         return null;
                     }
 
-                    Interlocked.Exchange(ref _connections[enemy.Key].IsEnemyFound, 1);
 
-                    GamingLobby lobby = new GamingLobby(roomSettings);
-                    
+                    Interlocked.Exchange(ref _connections[enemy.Key].IsEnemyFound, 1);
                     long[] userIds = new long[]
                     {
                         userId,
                         enemy.Key
                     };
 
+
+                    GamingLobby lobby = new GamingLobby(roomSettings);
+                    if (!lobby.GenerateQuestion())
+                        await CloseAll(userIds,"Module does not contain questions", WebSocketCloseStatus.InvalidPayloadData);
+
+                    lobby.AddPlayerId(userId);
+                    lobby.AddPlayerId(enemy.Key);
+
                     await SendAll(lobby.Id, userIds);
-                    await CloseAndRemoveAll(userIds);
+                    await CloseAll(userIds,"Lobby successfully created", WebSocketCloseStatus.NormalClosure);
+                    GlobalVariables.GamingLobbies.TryAdd(lobby.Id, lobby);
+
 
                     Interlocked.Exchange(ref isLocked, 0);
                     return lobby.Id;
@@ -60,18 +69,18 @@ namespace med_game.src.Managers
         {
             foreach(var userId in userIds)
             {
-                if (_connections[userId].WebSocket.CloseStatus == null)
+                if (_connections[userId].WebSocket.State == WebSocketState.Open)
                     await _connections[userId].WebSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
 
 
-        private static async Task CloseAndRemoveAll(long[] userIds)
+        private static async Task CloseAll(long[] userIds, string? errorMessage, WebSocketCloseStatus status)
         {
             foreach (var userId in userIds)
             {
                 if (_connections[userId].WebSocket.State == WebSocketState.Open)
-                    await _connections[userId].WebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                    await _connections[userId].WebSocket.CloseOutputAsync(status, errorMessage, CancellationToken.None);
             }
         }
     }

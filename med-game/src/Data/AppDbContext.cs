@@ -1,7 +1,9 @@
 ﻿using med_game.Models;
+using med_game.src.Entities;
 using med_game.src.models;
 using med_game.src.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace med_game.src.Data
 {
@@ -55,5 +57,10 @@ namespace med_game.src.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
         }
+    }
+
+    public static class GlobalVariables
+    {
+        public static readonly ConcurrentDictionary<string, GamingLobby> GamingLobbies = new();
     }
 }

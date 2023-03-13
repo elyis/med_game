@@ -29,6 +29,5 @@ namespace med_game.src.Entities
     {
         Image,
         Text,
-        Input
     }
 }

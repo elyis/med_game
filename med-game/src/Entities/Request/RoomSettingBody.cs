@@ -12,7 +12,7 @@ namespace med_game.src.Entities.Request
         public string? ModuleName { get; set; } = null;
 
         public TypeBattle Type { get; set; }
-        public int CountPlayers = 2;
+        public int CountPlayers { get; set; } = 2;
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

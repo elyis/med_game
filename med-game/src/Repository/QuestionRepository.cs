@@ -74,6 +74,46 @@ namespace med_game.src.Repository
             throw new NotImplementedException();
         }
 
+        public List<Question>? GenerateRandomQuestions(int lecternId, int? moduleId, int countQuestions)
+        {
+
+            List<Question> result = new List<Question>();
+            if (moduleId != null)
+            {
+                while (result.Count < countQuestions)
+                {
+                    var questions = _context.Questions
+                        .Where(q => q.Module.Id == moduleId)
+                        .OrderBy(q => EF.Functions.Random())
+                        .Take(countQuestions - result.Count);
+
+                    if (questions.Count() == 0)
+                        return null;
+                    result.AddRange(questions);
+                }
+                return result;
+            }
+
+            Lectern lectern = _context.Lecterns.Include(l => l.Modules).ThenInclude(l => l.Questions).First(l => l.Id == lecternId);
+            if(lectern.Modules.Count == 0)
+                return null;
+
+            int averageCountQuestionsFromModule = (int)Math.Ceiling((double)countQuestions / lectern.Modules.Count);
+
+            while(result.Count < countQuestions)
+            {
+                foreach (var module in lectern.Modules)
+                {
+                    var randomQuestions = module.Questions.OrderBy(q => EF.Functions.Random()).Take(averageCountQuestionsFromModule);
+                    result.AddRange(randomQuestions);
+
+                    if (result.Count >= countQuestions)
+                        break;
+                }
+            }
+            return result;
+        }
+
         public IEnumerable<Question> GetAllAsync()
             => _context.Questions;
 

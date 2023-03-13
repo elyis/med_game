@@ -43,7 +43,7 @@ namespace test.Controller
                 //},
                 new LecternBody
                 {
-                    Name = "Anatomy",
+                    Name = "Анатомия",
                     Description = "Изучает внутреннее строение тела"
                 },
             };

@@ -30,7 +30,7 @@ class GameLobbyDistributorTesting
     private readonly List<string> _accessTokens = new List<string>();
     private readonly List<(string email, string roomId)> _results = new List<(string email, string roomId)>();
     private readonly RoomSettingBody _roomSettingBody;
-    private readonly Uri uri = new Uri("wss://localhost:44335/main");
+    private readonly Uri uri = new Uri("wss://localhost:7296/main");
     private readonly List<Task<(string, string)>> _tasks = new ();
 
     private readonly List<ClientWebSocket> _clients = new List<ClientWebSocket>();

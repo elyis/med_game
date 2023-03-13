@@ -12,14 +12,14 @@ namespace test.Controller
         public async Task SuccesfulCreateModule()
         {
             ModuleController controller = new ModuleController();
-            string lecternName = "Anatomy";
+            string lecternName = "Анатомия";
 
             RequestedModuleBody[] moduleBodies = new RequestedModuleBody[]
             {
                 new RequestedModuleBody { LecternName = lecternName, ModuleName = "Остеология"},
                 new RequestedModuleBody { LecternName = lecternName, ModuleName = "Миология"},
                 new RequestedModuleBody { LecternName = lecternName, ModuleName = "Спланхнология"},
-                new RequestedModuleBody { LecternName = lecternName, ModuleName = "Центральная неврная система"},
+                new RequestedModuleBody { LecternName = lecternName, ModuleName = "Центральная нервная система"},
                 new RequestedModuleBody { LecternName = lecternName, ModuleName = "Периферическая нервная система"},
                 new RequestedModuleBody { LecternName = lecternName, ModuleName = "Сердечно-сосудистая система"},
                 new RequestedModuleBody { LecternName = lecternName, ModuleName = "Интересные факты"}
