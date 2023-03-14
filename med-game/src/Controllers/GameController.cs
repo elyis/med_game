@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Text;
 using System.Net.WebSockets;
 using med_game.src.Utility;
 using med_game.src.Entities;
-using med_game.src.Entities.Response;
 
 namespace med_game.src.Controllers
 {
@@ -58,10 +56,12 @@ namespace med_game.src.Controllers
                 lobby.AddPlayer(userId, webSocket);
                 if (lobby.Players.Count == lobby.PlayerInfo.Count)
                 {
-                    if (Interlocked.CompareExchange(ref lobby.isLobbyManaged, 1, 0) == 0)
+                    if (Interlocked.CompareExchange(ref lobby.isManaged, 1, 0) == 0)
                         await lobby.Start();
                     else
                         await Task.Delay(100);
+
+
                 }
                 
                 
@@ -74,22 +74,47 @@ namespace med_game.src.Controllers
                     {
                         while (webSocket.State == WebSocketState.Open && lobby.isLobbyRunning == 1)
                         {
-                            var answerOptions = await lobby.ReceiveJson<AnswerOption>(webSocket);
+                            AnswerOption? answer = await lobby.ReceiveJson<AnswerOption>(webSocket);
+                            if(answer == null)
+                            {
+                                await webSocket.CloseOutputAsync(WebSocketCloseStatus.Empty, "answer is null", CancellationToken.None);
+                                return;
+                            }
 
+                            if (lobby.Players[userId].IsPlayerAnswer == 0)
+                            {
+                                lobby.PlayerAnswer(answer, userId);
+
+                                if (lobby.countAnswering == lobby.Players.Count)
+                                {
+                                    if (Interlocked.CompareExchange(ref lobby.isManaged, 1, 0) == 0)
+                                    {
+                                        await lobby.SendStateGameAndQuestionToEveryone();
+                                        lobby.countAnswering = 0;
+                                        lobby.isManaged = 0;
+                                    }
+                                    else
+                                        await Task.Delay(2000);
+                                }
+                                else
+                                    await Task.Delay(2000);
+                            }
+                            else
+                                await Task.Delay(1000);
                         }
 
                     }catch(Exception ex)
                     {
-
+                        await webSocket.CloseOutputAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
                     }
                 }
                 catch (Exception ex)
                 {
-
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
                 }
                 finally
                 {
-
+                    
                 }
             }
             else

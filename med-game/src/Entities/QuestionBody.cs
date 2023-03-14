@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace med_game.src.Entities
 {
@@ -14,7 +16,7 @@ namespace med_game.src.Entities
         public List<AnswerOption> Answers { get; set; }
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum TypeQuestion
     {
         Image,

@@ -29,7 +29,9 @@ namespace med_game.src.Entities
         public int isLobbyRunning = 0;
         public int isEveryoneAnswer = 0;
         public int isAnsweredCorrectlyFirst = 0;
-        public int isLobbyManaged = 0;
+        public int isManaged = 0;
+        private int countPointsForRightAnswer = 1;
+        public int countAnswering = 0;
 
 
         public readonly Dictionary<long, GameStatisticInfo> PlayerInfo = new Dictionary<long, GameStatisticInfo>();
@@ -72,11 +74,34 @@ namespace med_game.src.Entities
             foreach(var player in Players)
                 player.Value.Statistics.MaxPoints = MaxPoints;
 
-            await SendStateGameToEveryone(null);
-            await Task.Delay(2000);
-            await SendQuestionToEveryone();
+            await SendStateGameAndQuestionToEveryone();
             isLobbyRunning = 1;
 
+        }
+
+        public async Task SendStateGameAndQuestionToEveryone()
+        {
+            if(CurrentQuestionIndex == CountQuestions)
+            {
+                var winner = Players.MaxBy(player => player.Value.Statistics.CountPoints);
+                await SendStateGameToEveryone(PlayerInfo[winner.Key].Nickname);
+                await CloseAll(WebSocketCloseStatus.NormalClosure, $"Questions {CurrentQuestionIndex}/{CountQuestions}");
+            }
+            else
+            {
+                await SendStateGameToEveryone(null);
+                await Task.Delay(2000);
+                await SendQuestionToEveryone();
+
+                foreach (var player in Players)
+                {
+                    Interlocked.CompareExchange(ref player.Value.IsPlayerAnswer, 0, 1);
+                    player.Value.Statistics.PointGain = 0;
+                }
+
+                isAnsweredCorrectlyFirst = 0;
+                isEveryoneAnswer = 0;
+            }
         }
 
         public async Task<T?> ReceiveJson<T>(WebSocket webSocket)
@@ -89,8 +114,13 @@ namespace med_game.src.Entities
             do
             {
                 result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
-                if (result.Count > 0)
+                if (result.Count > 0 && result.MessageType == WebSocketMessageType.Text)
                     memoryStream.Write(buffer.ToArray(), 0, result.Count);
+                else if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Close frame accepted", CancellationToken.None);
+                    return default;
+                }
 
             } while (!result.EndOfMessage && webSocket.State == WebSocketState.Open);
 
@@ -114,6 +144,31 @@ namespace med_game.src.Entities
         {
             StateGame stateGame = GetGameStatistics(winner);
             await SendAll(stateGame);
+        }
+
+        public async Task CloseAll(WebSocketCloseStatus status, string? description)
+        {
+            foreach(var player in Players)
+            {
+                if(player.Value.WebSocket.State == WebSocketState.Open || player.Value.WebSocket.State == WebSocketState.CloseReceived)
+                    await player.Value.WebSocket.CloseOutputAsync(status, description, CancellationToken.None);
+            }
+        }
+
+        public void PlayerAnswer(AnswerOption answer, long userId)
+        {
+            var question = Questions[CurrentQuestionIndex - 1];
+            if (answer.Equals(question.Answers[(int)question.CorrectAnswerIndex].ToAnswerOption()))
+            {
+                Players[userId].Statistics.PointGain = question.CountPointsPerAnswer;
+                if(Interlocked.CompareExchange(ref isAnsweredCorrectlyFirst, 1, 0) == 0)
+                    Players[userId].Statistics.PointGain += countPointsForRightAnswer;
+
+                Players[userId].Statistics.CountPoints += Players[userId].Statistics.PointGain;
+            }
+
+            Players[userId].IsPlayerAnswer = 1;
+            countAnswering++;
         }
 
         public StateGame GetGameStatistics(string? winner)

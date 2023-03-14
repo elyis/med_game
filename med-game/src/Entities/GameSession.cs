@@ -13,6 +13,6 @@ namespace med_game.src.Entities
 
         public WebSocket WebSocket { get; set; }
         public GameStatistics Statistics { get; set; }
-        public int IsPlayerAnswer { get; set; } = 0;
+        public int IsPlayerAnswer = 0;
     }
 }
