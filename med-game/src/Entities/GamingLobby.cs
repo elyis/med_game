@@ -1,10 +1,8 @@
 ﻿using med_game.src.Core.IRepository;
 using med_game.src.Data;
-using med_game.src.Entities.Request;
 using med_game.src.Entities.Response;
 using med_game.src.Models;
 using med_game.src.Repository;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
@@ -14,7 +12,7 @@ namespace med_game.src.Entities
 {
     public class GamingLobby
     {
-        public GamingLobby(RoomSettings roomSettings, int countQuestions = 10)
+        public GamingLobby(RoomSettings roomSettings, int countQuestions = 3)
         {
             RoomSettings = roomSettings;
             CountQuestions = countQuestions;
@@ -63,12 +61,72 @@ namespace med_game.src.Entities
             return true;
         }
 
-        public async Task ProcessLoop()
+        public async Task ProcessLoop(WebSocket webSocket, long userId)
         {
+            if (Players.Count == PlayerInfo.Count)
+            {
+                if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                    await Start();
+            }
 
+
+            try
+            {
+                while (isLobbyRunning == 0)
+                    await Task.Delay(1000);
+
+                try
+                {
+                    AnswerOption? answer = null;
+                    while (webSocket.State == WebSocketState.Open && isLobbyRunning == 1)
+                    {
+                        if (Players[userId].IsPlayerAnswer == 0)
+                        {
+                            answer = await ReceiveJson<AnswerOption>(webSocket);
+                            if (answer == null)
+                            {
+                                await webSocket.CloseOutputAsync(WebSocketCloseStatus.Empty, "answer is null", CancellationToken.None);
+                                return;
+                            }
+
+                            PlayerAnswer(answer, userId);
+
+                            if (countAnswering == Players.Count)
+                            {
+                                if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                {
+                                    await SendStateGameAndQuestionToEveryone();
+                                    countAnswering = 0;
+                                    Interlocked.Exchange(ref isManaged, 0);
+                                }
+                                else
+                                    await Task.Delay(2000);
+                            }
+                            else
+                                await Task.Delay(2000);
+                        }
+                        else
+                            await Task.Delay(2000);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    await CloseAll(WebSocketCloseStatus.InternalServerError, ex.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                await webSocket.CloseOutputAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
+
+            }
+            finally
+            {
+
+            }
         }
 
-        public async Task Start()
+        private async Task Start()
         {
             MaxPoints = Questions.Select(e => e.CountPointsPerAnswer).Sum();
             foreach(var player in Players)
@@ -76,10 +134,10 @@ namespace med_game.src.Entities
 
             await SendStateGameAndQuestionToEveryone();
             isLobbyRunning = 1;
-
+            isManaged = 0;
         }
 
-        public async Task SendStateGameAndQuestionToEveryone()
+        private async Task SendStateGameAndQuestionToEveryone()
         {
             if(CurrentQuestionIndex == CountQuestions)
             {
@@ -95,7 +153,7 @@ namespace med_game.src.Entities
 
                 foreach (var player in Players)
                 {
-                    Interlocked.CompareExchange(ref player.Value.IsPlayerAnswer, 0, 1);
+                    Interlocked.Exchange(ref player.Value.IsPlayerAnswer, 0);
                     player.Value.Statistics.PointGain = 0;
                 }
 
@@ -104,7 +162,7 @@ namespace med_game.src.Entities
             }
         }
 
-        public async Task<T?> ReceiveJson<T>(WebSocket webSocket)
+        private async Task<T?> ReceiveJson<T>(WebSocket webSocket)
         {
             byte[] buffer = new byte[2048];
 
@@ -118,7 +176,7 @@ namespace med_game.src.Entities
                     memoryStream.Write(buffer.ToArray(), 0, result.Count);
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Close frame accepted", CancellationToken.None);
+                    await CloseAll(WebSocketCloseStatus.NormalClosure, "Close frame accepter");
                     return default;
                 }
 
@@ -127,26 +185,26 @@ namespace med_game.src.Entities
             return JsonConvert.DeserializeObject<T?>(Encoding.UTF8.GetString(memoryStream.ToArray()));
         }
 
-        public async Task SendAll<T> (T jsonMessage)
+        private async Task SendAll<T> (T jsonMessage)
         {
             string message = JsonConvert.SerializeObject(jsonMessage);
             foreach(var player in Players)
                 await player.Value.WebSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-        public async Task SendQuestionToEveryone()
+        private async Task SendQuestionToEveryone()
         {
             QuestionBody question = GetQuestionBody();  
             await SendAll(question);
         }
 
-        public async Task SendStateGameToEveryone(string? winner)
+        private async Task SendStateGameToEveryone(string? winner)
         {
             StateGame stateGame = GetGameStatistics(winner);
             await SendAll(stateGame);
         }
 
-        public async Task CloseAll(WebSocketCloseStatus status, string? description)
+        private async Task CloseAll(WebSocketCloseStatus status, string? description)
         {
             foreach(var player in Players)
             {
@@ -155,7 +213,7 @@ namespace med_game.src.Entities
             }
         }
 
-        public void PlayerAnswer(AnswerOption answer, long userId)
+        private void PlayerAnswer(AnswerOption answer, long userId)
         {
             var question = Questions[CurrentQuestionIndex - 1];
             if (answer.Equals(question.Answers[(int)question.CorrectAnswerIndex].ToAnswerOption()))
@@ -168,10 +226,10 @@ namespace med_game.src.Entities
             }
 
             Players[userId].IsPlayerAnswer = 1;
-            countAnswering++;
+            Interlocked.Increment(ref countAnswering);
         }
 
-        public StateGame GetGameStatistics(string? winner)
+        private StateGame GetGameStatistics(string? winner)
         {
             return new StateGame
             {
@@ -181,7 +239,7 @@ namespace med_game.src.Entities
             };
         }
 
-        public QuestionBody GetQuestionBody()
+        private QuestionBody GetQuestionBody()
         {
             var question = Questions[CurrentQuestionIndex];
             CurrentQuestionIndex++;

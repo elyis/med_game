@@ -38,84 +38,20 @@ namespace med_game.src.Controllers
 
                 if (!GlobalVariables.GamingLobbies.ContainsKey(lobbyId))
                 {
-                    await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "session isn't exist", CancellationToken.None);
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InvalidPayloadData, "session isn't exist", CancellationToken.None);
                     return;
                 }
 
-                if (!GlobalVariables.GamingLobbies[lobbyId].PlayerInfo.Keys.Contains(userId))
+                if (!GlobalVariables.GamingLobbies[lobbyId].PlayerInfo.ContainsKey(userId))
                 {
-                    await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "player don't belong to this room", CancellationToken.None);
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InvalidPayloadData, "player don't belong to this room", CancellationToken.None);
                     return;
                 }
 
                 GamingLobby lobby = GlobalVariables.GamingLobbies[lobbyId];
-                AnswerOption? playerAnswer = null;
-                WebSocketReceiveResult? result = null;
-
-
                 lobby.AddPlayer(userId, webSocket);
-                if (lobby.Players.Count == lobby.PlayerInfo.Count)
-                {
-                    if (Interlocked.CompareExchange(ref lobby.isManaged, 1, 0) == 0)
-                        await lobby.Start();
-                    else
-                        await Task.Delay(100);
 
-
-                }
-                
-                
-                try
-                {
-                    while (lobby.isLobbyRunning == 0)
-                        await Task.Delay(500);
-
-                    try
-                    {
-                        while (webSocket.State == WebSocketState.Open && lobby.isLobbyRunning == 1)
-                        {
-                            AnswerOption? answer = await lobby.ReceiveJson<AnswerOption>(webSocket);
-                            if(answer == null)
-                            {
-                                await webSocket.CloseOutputAsync(WebSocketCloseStatus.Empty, "answer is null", CancellationToken.None);
-                                return;
-                            }
-
-                            if (lobby.Players[userId].IsPlayerAnswer == 0)
-                            {
-                                lobby.PlayerAnswer(answer, userId);
-
-                                if (lobby.countAnswering == lobby.Players.Count)
-                                {
-                                    if (Interlocked.CompareExchange(ref lobby.isManaged, 1, 0) == 0)
-                                    {
-                                        await lobby.SendStateGameAndQuestionToEveryone();
-                                        lobby.countAnswering = 0;
-                                        lobby.isManaged = 0;
-                                    }
-                                    else
-                                        await Task.Delay(2000);
-                                }
-                                else
-                                    await Task.Delay(2000);
-                            }
-                            else
-                                await Task.Delay(1000);
-                        }
-
-                    }catch(Exception ex)
-                    {
-                        await webSocket.CloseOutputAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
-                }
-                finally
-                {
-                    
-                }
+                await lobby.ProcessLoop(webSocket, userId);
             }
             else
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
