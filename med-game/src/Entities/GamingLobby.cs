@@ -99,13 +99,7 @@ namespace med_game.src.Entities
                     {
                         if (Players[userId].IsPlayerAnswer == 0)
                         {
-                            answer = await ReceiveJson<AnswerOption>(webSocket);
-                            if (answer == null)
-                            {
-                                await webSocket.CloseOutputAsync(WebSocketCloseStatus.Empty, "answer is null", CancellationToken.None);
-                                return;
-                            }
-
+                            answer = await ReceiveJson<AnswerOption>(webSocket) ?? throw new JsonSerializationException();
                             PlayerAnswer(answer, userId);
 
                             if (countAnswering == Players.Count)

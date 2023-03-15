@@ -38,11 +38,13 @@ namespace med_game.src.Service
                     return;
 
 
+
                 try
                 {
                     RoomSettingBody? roomSettingBody = await ReceiveRoomSettingJsonAsync(webSocket) ?? throw new JsonSerializationException();
                     Lectern? lectern = await _lecternRepository.GetAsync(roomSettingBody.LecternName);
                     Module? module = null;
+
 
 
                     if (roomSettingBody.ModuleName != null)
@@ -73,27 +75,43 @@ namespace med_game.src.Service
                     if (!GameLobbyDistributorManager.AddConnection(userId, connection))
                         return;
 
+                    byte[] buffer = new byte[512];
+                    CancellationTokenSource source = new();
+                    CancellationToken token = source.Token;
+
+                    
+                    Task<WebSocketReceiveResult> task = webSocket.ReceiveAsync(buffer, token);
                     while (webSocket.State == WebSocketState.Open && roomId == null)
                     {
+                        if (task.IsCompletedSuccessfully && task.Result.MessageType == WebSocketMessageType.Close)
+                            await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Distributor accepted close frame", CancellationToken.None);
+
                         roomId = await GameLobbyDistributorManager.GetLobbyId(userId, roomSettings);
                         await Task.Delay(1000);
                     }
+                    if (task.Status == TaskStatus.Running)
+                        source.Cancel();
                 }
 
-                catch (JsonReaderException)
+                catch (JsonSerializationException)
                 {
-                    await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Serialization error", CancellationToken.None);
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InvalidPayloadData, "Serialization error", CancellationToken.None);
+                }
+
+                catch(WebSocketException ex)
+                {
+
                 }
 
                 catch (Exception ex)
                 {
-                    await webSocket.CloseAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
                 }
                 finally
                 {
                     GameLobbyDistributorManager.RemoveConnection(userId);
-                    if (webSocket.State == WebSocketState.Open)
-                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                    if(webSocket.State == WebSocketState.Open)
+                        await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
                 }
             }
             else
@@ -115,7 +133,13 @@ namespace med_game.src.Service
 
             } while (!result.EndOfMessage);
 
-            return JsonConvert.DeserializeObject<RoomSettingBody?>(Encoding.UTF8.GetString(memoryStream.ToArray()));
+            return JsonConvert.DeserializeObject<RoomSettingBody?>(
+                Encoding.UTF8.GetString(memoryStream.ToArray()), 
+                new JsonSerializerSettings 
+                { 
+                    MissingMemberHandling = MissingMemberHandling.Error
+                }
+                );
         }
     }
 }

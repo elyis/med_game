@@ -22,7 +22,6 @@ namespace med_game.src.Controllers
 
 
 
-        [HttpGet]
         [Authorize]
         public async Task ConnectToGame(string lobbyId)
         {

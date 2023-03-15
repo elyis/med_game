@@ -14,7 +14,7 @@ using med_game.src.Core.IManager;
 
 namespace med_game.src.Controllers
 {
-    [Route("auth")]
+    //[Route("auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -35,7 +35,8 @@ namespace med_game.src.Controllers
         }
 
 
-        [HttpPost("register")]
+        //[HttpPost("register")]
+        [HttpPost("sign_up")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -46,8 +47,9 @@ namespace med_game.src.Controllers
             return result == null ? Conflict("Email is exist") : Ok(result);
         }
 
-        
-        [HttpPost("login")]
+
+        //[HttpPost("login")]
+        [HttpPost("sign_in")]
         [ProducesResponseType(typeof(TokenPair), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
 
