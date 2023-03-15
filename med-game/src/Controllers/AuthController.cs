@@ -58,7 +58,7 @@ namespace med_game.src.Controllers
         }
 
 
-        [HttpPost("restore-token")]
+        [HttpPost("token")]
         [ProducesResponseType(typeof(TokenPair), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
 

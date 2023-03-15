@@ -14,7 +14,7 @@ namespace test.Controller
         {   
             RegistrationBody registrationBody = new RegistrationBody 
             { 
-                Email = "testy@ss", 
+                Mail = "testy@ss", 
                 Nickname = "testy", 
                 Password = "success" 
             };
@@ -40,7 +40,7 @@ namespace test.Controller
 
             Login login = new Login
             {
-                Email = "testy@ss",
+                Mail = "testy@ss",
                 Password = "success"
             };
 
@@ -59,7 +59,7 @@ namespace test.Controller
 
             Login login = new Login
             {
-                Email = "testy@ss",
+                Mail = "testy@ss",
                 Password = "failed"
             };
 

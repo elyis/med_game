@@ -61,7 +61,7 @@ namespace med_game.src.Service
             TokenPair tokenPair = _jwtManager.GenerateTokenPair(claims);
             string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.RefreshToken);
 
-            bool isUpdateToken = await _userRepository.UpdateTokenAsync(hashRefreshToken, user.Email);
+            bool isUpdateToken = await _userRepository.UpdateTokenAsync(hashRefreshToken, user.Mail);
             return isUpdateToken ? tokenPair : null;
         }
 

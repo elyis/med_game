@@ -80,14 +80,14 @@ class GameLobbyDistributorTesting
         {
             var registrationBody = new RegistrationBody
             {
-                Email = "testy@" + i,
+                Mail = "testy@" + i,
                 Nickname = "testy" + i,
                 Password = "password"
             };
 
             var login = new Login
             {
-                Email = registrationBody.Email,
+                Mail = registrationBody.Mail,
                 Password = registrationBody.Password
             };
 
@@ -147,7 +147,7 @@ class GameLobbyDistributorTesting
         {
             byte[] bytes = new byte[2048];
 
-            _tasks.Add(ReceiveRoomId(_clients[login.index], login.value.Email));
+            _tasks.Add(ReceiveRoomId(_clients[login.index], login.value.Mail));
         }
         
         foreach(var task in _tasks)

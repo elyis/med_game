@@ -105,7 +105,7 @@ namespace med_game.src.Service
             byte[] buffer = new byte[2048];
 
             WebSocketReceiveResult? result = null;
-            MemoryStream memoryStream = new MemoryStream();
+            MemoryStream memoryStream = new();
 
             do
             {

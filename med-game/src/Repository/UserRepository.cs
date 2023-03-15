@@ -20,13 +20,13 @@ namespace med_game.src.Repository
 
         public async Task<User?> AddAsync(RegistrationBody registrationBody, string role)
         {
-            User? user = await GetAsync(registrationBody.Email);
+            User? user = await GetAsync(registrationBody.Mail);
             if (user != null)
                 return null;
 
             var model = new User 
             { 
-                Email = registrationBody.Email, 
+                Email = registrationBody.Mail, 
                 Password = registrationBody.Password, 
                 Nickname = registrationBody.Nickname,
                 RoleName = role,
@@ -102,7 +102,7 @@ namespace med_game.src.Repository
             => await _context.Users
             .FirstOrDefaultAsync
             (
-                u => u.Email == login.Email
+                u => u.Email == login.Mail
                 &&
                 u.Password == login.Password
             );
@@ -539,6 +539,18 @@ namespace med_game.src.Repository
         {
             var ratingTable = _context.Users.OrderByDescending(u => u.Rating).Select(u => u.ToRatingInfo());
             return ratingTable;
+        }
+
+        public async Task UpdateRating(long id, int countPoints)
+        {
+            User? user = await GetAsync(id);
+            if( user == null ) 
+                return;
+
+            user.Rating += countPoints;
+            if (user.Rating < 0)
+                user.Rating = 0;
+            await _context.SaveChangesAsync();
         }
     }
 

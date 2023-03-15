@@ -50,5 +50,6 @@ namespace med_game.src.Core.IRepository
         Task<ProfileBody?> GetProfileAsync(long id);
         Task<ProfileBody?> GetProfileAsync(string email);
         IEnumerable<RatingInfo> GetRatingInfo();
+        Task UpdateRating(long id, int countPoints);
     }
 }
