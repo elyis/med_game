@@ -64,9 +64,9 @@ namespace med_game.src.Controllers
         [ProducesResponseType(typeof(TokenPair), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
 
-        public async Task<IActionResult> RestoreToken(TokenPair tokenPair)
+        public async Task<IActionResult> RestoreToken([FromBody] string refreshToken)
         {
-            var result = await _authService.UpdateTokenAsync(tokenPair);
+            var result = await _authService.UpdateTokenAsync(refreshToken);
             return result == null ? NotFound() : Ok(result);
         }
 

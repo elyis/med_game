@@ -37,7 +37,7 @@ namespace med_game.src.Service
             };
 
             TokenPair tokenPair = _jwtManager.GenerateTokenPair(claims);
-            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.RefreshToken);
+            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.Refresh_token);
 
             bool isUpdateToken = await _userRepository.UpdateTokenAsync(hashRefreshToken, user.Email );
             return isUpdateToken ? tokenPair : null;
@@ -59,7 +59,7 @@ namespace med_game.src.Service
             };
 
             TokenPair tokenPair = _jwtManager.GenerateTokenPair(claims);
-            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.RefreshToken);
+            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.Refresh_token);
 
             bool isUpdateToken = await _userRepository.UpdateTokenAsync(hashRefreshToken, user.Mail);
             return isUpdateToken ? tokenPair : null;
@@ -67,32 +67,27 @@ namespace med_game.src.Service
 
 
 
-        public async Task<TokenPair?> UpdateTokenAsync(TokenPair tokenPair)
+        public async Task<TokenPair?> UpdateTokenAsync(string refreshToken)
         {
-            string? userIdClaim = _jwtUtilities.GetClaimUserId(tokenPair.AccessToken);
-            if (!long.TryParse(userIdClaim, out long userId))
+            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(refreshToken);
+            var user = await _userRepository.GetByToken(hashRefreshToken);
+            if(user == null) 
                 return null;
 
-            var user = await _userRepository.GetAsync(userId);
-            if (user == null) 
-                return null;
+            List<Claim> claims = new List<Claim>
+                {
+                    new Claim("UserId", user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, user.RoleName)
+                };
 
-
-            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.RefreshToken);
-
-            //Одинаковые хэши refresh tokens
-            if (user.TokenHash == hashRefreshToken)
+            TokenPair tokenPair = new TokenPair
             {
-                List<Claim> claims = new List<Claim>
-                    {
-                        new Claim("UserId", user.Id.ToString()),
-                        new Claim(ClaimTypes.Role, user.RoleName)
-                    };
-                tokenPair.AccessToken = _jwtManager.GenerateAccessToken(claims);
+                Access_token = _jwtManager.GenerateAccessToken(claims),
+                Refresh_token = refreshToken
+            };
 
-                if (user.TokenValidBefore < DateTime.UtcNow)
-                    tokenPair.RefreshToken = _jwtManager.GenerateRefreshToken();
-            }
+            if (user.TokenValidBefore < DateTime.UtcNow)
+                tokenPair.Refresh_token = _jwtManager.GenerateRefreshToken();
 
             return tokenPair;
         }

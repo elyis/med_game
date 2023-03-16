@@ -2,10 +2,10 @@
 {
     public class Constants
     {
-        private const string server_url = "https://localhost:44335/";
+        private const string server_url = "http://192.168.1.165:5121/";
 
         //local photo storage 
-        public const string pathToIcons = @"C:\Users\su\source\repos\med-game\med-game\src\Resources\Storages\";
+        public const string pathToIcons = @"src\Resources\Storages\";
         public const string pathToAnswerIcons = $@"{pathToIcons}AnswerIcons\";
         public const string pathToQuestionIcons = $@"{pathToIcons}QuestionIcons\";
         public const string pathToAchievementIcons = $@"{pathToIcons}AchievementIcons\";

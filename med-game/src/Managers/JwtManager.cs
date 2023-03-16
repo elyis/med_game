@@ -34,8 +34,8 @@ namespace med_game.src.Managers
 
             return new TokenPair
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
+                Access_token = $"Bearer {accessToken}",
+                Refresh_token = refreshToken
             };
         }
 

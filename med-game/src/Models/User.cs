@@ -48,8 +48,8 @@ namespace med_game.src.Models
             {
                 Nickname = Nickname,
                 Email = Email,
-                UrlIcon = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
-                Achievements = Achievements.Select(a => a.ToAchievementBody()).ToList()
+                UrlIcon = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}",
+                //Achievements = Achievements.Select(a => a.ToAchievementBody()).ToList()
             };
         }
 

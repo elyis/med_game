@@ -52,6 +52,9 @@ namespace med_game.src.Repository
         public async Task<User?> GetAsync(string email)
             => await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
+        public async Task<User?> GetByToken(string refreshTokenHash)
+            => await _context.Users.FirstOrDefaultAsync(u => u.TokenHash == refreshTokenHash);
+
         public async Task<bool> RemoveAsync(long id)
         {
             User? user = await GetAsync(id);
