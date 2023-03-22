@@ -4,21 +4,21 @@
     {
         public GameStatistics(string nickname, string? image)
         {
-            Nickname = nickname;
-            Image = image;
+            this.nickname = nickname;
+            this.image = image;
         }
 
-        public string Nickname { get; set; }
-        public string? Image { get; set; }
-        public int CountPoints { get; set; } = 0;
-        public int PointGain { get; set; } = 0;
-        public int MaxPoints { get; set; } = 0;
+        public string nickname { get; set; }
+        public string? image { get; set; }
+        public int countOfPoints { get; set; } = 0;
+        public int pointGain { get; set; } = 0;
+        public int maxPointsGame { get; set; } = 0;
     }
 
     public class StateGame
     {
-        public bool IsEndGame { get; set; }
-        public List<GameStatistics> Statistics { get; set;}
-        public string? WinnerName { get; set; }
+        public bool isEndGame { get; set; }
+        public List<GameStatistics> rating { get; set;}
+        public string? nameWinner { get; set; }
     }
 }

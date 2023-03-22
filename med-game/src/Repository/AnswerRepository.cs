@@ -23,9 +23,9 @@ namespace med_game.src.Repository
 
             Answer model = new()
             {
-                Description = answerOption.Text,
-                Image = answerOption.Image,
-                Type = Enum.GetName(typeof(AnswerOption), answerOption.Type)!
+                Description = answerOption.text,
+                Image = answerOption.image,
+                Type = Enum.GetName(typeof(AnswerOption), answerOption.type)!
             };
 
             var result = await _context.Answers.AddAsync(model);
@@ -47,9 +47,9 @@ namespace med_game.src.Repository
             {
                 Answer model = new()
                 {
-                    Description = answer.Text,
-                    Image = answer.Image,
-                    Type = Enum.GetName(typeof(TypeAnswer), answer.Type)!
+                    Description = answer.text,
+                    Image = answer.image,
+                    Type = Enum.GetName(typeof(TypeAnswer), answer.type)!
                 };
 
                 answers.Add(model);
@@ -109,9 +109,9 @@ namespace med_game.src.Repository
         public async Task<Answer?> GetAsync(AnswerOption answer)
             => await _context.Answers
                 .FirstOrDefaultAsync(a => 
-                    a.Description == answer.Text && 
-                    a.Type == Enum.GetName(typeof(TypeAnswer), answer.Type) && 
-                    a.Image == answer.Image);
+                    a.Description == answer.text && 
+                    a.Type == Enum.GetName(typeof(TypeAnswer), answer.type) && 
+                    a.Image == answer.image);
     }
 
 }

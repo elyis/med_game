@@ -35,31 +35,31 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Опорная, двигательная, защитная, биологическая",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Опорная, двигательная, защитная, биологическая",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Опорная, двигательная, защитная, биологическая",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Опорная, двигательная, защитная, биологическая",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Вместилище внутренних органов, депо минеральных веществ",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Вместилище внутренних органов, депо минеральных веществ",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Кровеотводная, защитная, двигательная",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Кровеотводная, защитная, двигательная",
+                            image = null,
                         }
                     }
                 },
@@ -74,31 +74,31 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Органические и неорганический вещества",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Органические и неорганический вещества",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Органические и неорганический вещества",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Органические и неорганический вещества",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Белки, жиры, углеводы, соли кальция",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Белки, жиры, углеводы, соли кальция",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Кальций, магний, фосфор, марганец, белки",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Кальций, магний, фосфор, марганец, белки",
+                            image = null,
                         }
                     }
                 },
@@ -115,45 +115,45 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Большеберцовая кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Большеберцовая кость",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Большеберцовая кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Большеберцовая кость",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Малоберцовая кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Малоберцовая кость",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Бедренная кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Бедренная кость",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Надколенник",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Надколенник",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Таранная кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Таранная кость",
+                            image = null,
                         }
                     }
                 },
@@ -165,48 +165,48 @@ namespace test.Controller
                     TimeSeconds = 78,
                     Text = "Что изображено под 6-ым пунктом?",
                     Description = null,
-                    Image = "скелет.jpg",
+                    Image = "skeleton.jpg",
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Плечевая кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Плечевая кость",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Большеберцовая кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Большеберцовая кость",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Малоберцовая кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Малоберцовая кость",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Бедренная кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Бедренная кость",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Плечевая кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Плечевая кость",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Таранная кость",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Таранная кость",
+                            image = null,
                         }
                     }
                 },
@@ -214,24 +214,24 @@ namespace test.Controller
                 {
                     LecternName = lecternName,
                     ModuleName = "Остеология",
-                    TypeQuestion = TypeQuestion.Input,
+                    TypeQuestion = TypeQuestion.Text,
                     TimeSeconds = 78,
                     Text = "facies auricularis ossis sacri",
                     Description = null,
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "ушковидная поверхность крестца",
-                            Image = null,
+                            type = TypeAnswer.Input,
+                            text = "ушковидная поверхность крестца",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "ушковидная поверхность крестца",
-                            Image = null,
+                            type = TypeAnswer.Input,
+                            text = "ушковидная поверхность крестца",
+                            image = null,
                         }
                     }
                 },
@@ -246,38 +246,38 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                     {
-                        Type = TypeAnswer.Text,
-                        Text = "Мезодерма сомитов",
-                        Image = null,
+                        type = TypeAnswer.Text,
+                        text = "Мезодерма сомитов",
+                        image = null,
                     },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Эктодерма",
-                            Image = null
+                            type = TypeAnswer.Text,
+                            text = "Эктодерма",
+                            image = null
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Мезодерма сомитов",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Мезодерма сомитов",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Мезодерма спланхнотомов",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Мезодерма спланхнотомов",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Энтодерма",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Энтодерма",
+                            image = null,
                         }
                     }
                 },
@@ -292,38 +292,38 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Одноперистая",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Одноперистая",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Веретенообразная",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Веретенообразная",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Одноперистая",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Одноперистая",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Двуперистая",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Двуперистая",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Многоперистая",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Многоперистая",
+                            image = null,
                         }
                     }
                 },
@@ -338,38 +338,38 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Остистые отростки позвонков",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Остистые отростки позвонков",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Поперечные отростки позвонков",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Поперечные отростки позвонков",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Остистые отростки позвонков",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Остистые отростки позвонков",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Суставные отростки позвонков",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Суставные отростки позвонков",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Шейки ребер",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Шейки ребер",
+                            image = null,
                         }
                     }
                 },
@@ -381,34 +381,34 @@ namespace test.Controller
                     TimeSeconds = 100,
                     Text = "Что указано под 4?",
                     Description = null,
-                    Image = "миология.jpeg",
+                    Image = "myology.jpeg",
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "pectoralis major",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "pectoralis major",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "pectoralis major",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "pectoralis major",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "psoas major",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "psoas major",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "platysma",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "platysma",
+                            image = null,
                         },
                     }
                 },
@@ -423,31 +423,31 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Image,
-                            Text = null,
-                            Image = "img_1.png",
+                            type = TypeAnswer.Image,
+                            text = null,
+                            image = "img_1.png",
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Image,
-                            Text = null,
-                            Image = "img_1.png",
+                            type = TypeAnswer.Image,
+                            text = null,
+                            image = "img_1.png",
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Image,
-                            Text = "img_2.png",
-                            Image = null,
+                            type = TypeAnswer.Image,
+                            text = null,
+                            image = "img_2.png",
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Image,
-                            Text = "img_3.png",
-                            Image = null,
+                            type = TypeAnswer.Image,
+                            text = null,
+                            image = "img_3.png",
                         },
                     }
                 },
@@ -462,31 +462,31 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "labia oris",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "labia oris",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "labia oris",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "labia oris",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "dens",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "dens",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Lingua",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Lingua",
+                            image = null,
                         },
                     }
                 },
@@ -501,31 +501,31 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "6-7 лет",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "6-7 лет",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "9-10 лет",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "9-10 лет",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "6-7 лет",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "6-7 лет",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "8 лет",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "8 лет",
+                            image = null,
                         },
                     }
                 },
@@ -540,31 +540,31 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "желобовидные сосочки",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "желобовидные сосочки",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "нитевидные сосочки",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "нитевидные сосочки",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "грибовидные сосочки",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "грибовидные сосочки",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "желобовидные сосочки",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "желобовидные сосочки",
+                            image = null,
                         },
                     }
                 },
@@ -579,31 +579,31 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "20",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "20",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "24",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "24",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "20",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "20",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "16",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "16",
+                            image = null,
                         },
                     }
                 },
@@ -618,38 +618,38 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Нейрон",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Нейрон",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Синапс",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Синапс",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Нейрон",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Нейрон",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Рецептор",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Рецептор",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Рефлекс",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Рефлекс",
+                            image = null,
                         }
                     }
                 },
@@ -664,38 +664,38 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "шейное",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "шейное",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "терминальное",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "терминальное",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "копчиковое",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "копчиковое",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "грудное",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "грудное",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "шейное",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "шейное",
+                            image = null,
                         }
                     }
                 },
@@ -710,38 +710,38 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "8",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "8",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "5",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "5",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "7",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "7",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "8",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "8",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "12",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "12",
+                            image = null,
                         }
                     }
                 },
@@ -756,24 +756,24 @@ namespace test.Controller
                     Image = "img_1.png",
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Центральная нервная система",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Центральная нервная система",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Центральная нервная система",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Центральная нервная система",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Периферическая нервная система",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Периферическая нервная система",
+                            image = null,
                         },
                     }
                 },
@@ -788,24 +788,24 @@ namespace test.Controller
                     Image = "img_2.png",
                     RightAnswer = new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Периферическая нервная система",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Периферическая нервная система",
+                            image = null,
                         },
                     ListOfAnswers = new List<AnswerOption>
                     {
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Центральная нервная система",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Центральная нервная система",
+                            image = null,
                         },
 
                         new AnswerOption
                         {
-                            Type = TypeAnswer.Text,
-                            Text = "Периферическая нервная система",
-                            Image = null,
+                            type = TypeAnswer.Text,
+                            text = "Периферическая нервная система",
+                            image = null,
                         },
                     }
                 },

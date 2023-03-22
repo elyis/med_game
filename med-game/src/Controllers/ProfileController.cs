@@ -18,18 +18,11 @@ namespace med_game.src.Controllers
         private readonly FileUploader _fileUploader;
         private readonly JwtUtilities _jwtUtilities;
 
-        private readonly List<string> _validFileFormats = new()
-        {
-            "image/jpeg",
-            "image/png",
-        };
-
-
-        public ProfileController()
+        public ProfileController(ILoggerFactory loggerFactory)
         {
             AppDbContext context = new AppDbContext();
             _userRepository = new UserRepository(context);
-            _fileUploader = new FileUploader();
+            _fileUploader = new FileUploader(loggerFactory);
             _jwtUtilities = new JwtUtilities();
         }
 
@@ -44,7 +37,7 @@ namespace med_game.src.Controllers
         public async Task<IActionResult> UploadProfileIcon()
         {
             string? contentType = Request.Headers.ContentType;
-            if (contentType != null && _validFileFormats.Contains(contentType!))
+            if (contentType?.StartsWith("image/") == true)
             {
                 string token = Request.Headers.Authorization!;
                 string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
@@ -52,7 +45,7 @@ namespace med_game.src.Controllers
                 if (!long.TryParse(userIdClaim, out long userId))
                     return Unauthorized();
 
-                var filename = await _fileUploader.UploadImage(Constants.pathToProfileIcons, Request.Body, contentType!.Split('/').Last());
+                var filename = await _fileUploader.UploadImage(Constants.pathToProfileIcons, Request.Body);
                 if (filename == null)
                     return BadRequest();
 
@@ -95,8 +88,7 @@ namespace med_game.src.Controllers
             if (bytes == null)
                 return NotFound();
 
-            string extension = filename.Split('.').Last();
-            return File(bytes, $"image/{extension}", filename);
+            return File(bytes, $"image/jpeg", filename);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using med_game.src.Core.IRepository;
 using med_game.src.Data;
+using med_game.src.Entities;
 using med_game.src.Entities.Response;
 using med_game.src.Repository;
 using med_game.src.Utility;
@@ -45,12 +46,12 @@ namespace med_game.src.Controllers
 
         [HttpGet("rating")]
         [Authorize]
-        [ProducesResponseType(typeof(List<RatingInfo>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Rating), (int)HttpStatusCode.OK)]
 
         public IActionResult GetPlayerRating()
         {
-            var userRating = _userRepository.GetRatingInfo().ToList();
-            return Ok(userRating);
+            var rating = _userRepository.GetRatingInfo();
+            return Ok(rating);
         }
 
     }

@@ -6,14 +6,14 @@ namespace med_game.src.Entities
 {
     public class QuestionBody
     {
-        public TypeQuestion Type { get; set; }
-        public string? Text { get; set; }
-        public string? Description { get; set; }
-        public string? Image { get; set; }
-        public int TimeSeconds { get; set; }
-        public int NumOfPointsPerAnswer { get; set; }
-        public AnswerOption RightAnswer { get; set; }
-        public List<AnswerOption> Answers { get; set; }
+        public TypeQuestion type { get; set; }
+        public string? text { get; set; }
+        public string? description { get; set; }
+        public string? image { get; set; }
+        public int timeSeconds { get; set; }
+        public int numOfPointsPerAnswer { get; set; }
+        public AnswerOption rightAnswer { get; set; }
+        public List<AnswerOption> answers { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -21,7 +21,6 @@ namespace med_game.src.Entities
     {
         Image,
         Text,
-        Input,
     }
 
     public class QuestionProperties

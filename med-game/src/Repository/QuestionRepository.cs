@@ -18,10 +18,10 @@ namespace med_game.src.Repository
         {
             QuestionProperties questionProperties = new()
             {
-                Description = questionBody.Description,
-                Image = questionBody.Image,
-                Text = questionBody.Text,
-                Type = questionBody.Type
+                Description = questionBody.description,
+                Image = questionBody.image,
+                Text = questionBody.text,
+                Type = questionBody.type
             };
 
             var question = await GetAsync(questionProperties, module);
@@ -30,12 +30,12 @@ namespace med_game.src.Repository
 
             Question model = new()
             {
-                Description = questionBody.Description,
-                Image = questionBody.Image,
-                Text = questionBody.Text,
-                Type = Enum.GetName(typeof(TypeQuestion), questionBody.Type)!,
-                TimeSeconds = questionBody.TimeSeconds,
-                CountPointsPerAnswer = questionBody.NumOfPointsPerAnswer,   
+                Description = questionBody.description,
+                Image = questionBody.image,
+                Text = questionBody.text,
+                Type = Enum.GetName(typeof(TypeQuestion), questionBody.type)!,
+                TimeSeconds = questionBody.timeSeconds,
+                CountPointsPerAnswer = questionBody.numOfPointsPerAnswer,   
                 CorrectAnswerIndex = rightAnswerId
             };
 
@@ -83,9 +83,10 @@ namespace med_game.src.Repository
                 while (result.Count < countQuestions)
                 {
                     var questions = _context.Questions
-                        .Where(q => q.Module.Id == moduleId)
                         .Include(q => q.Answers)
-                        .OrderBy(q => EF.Functions.Random())
+                        .AsEnumerable()
+                        .Where(q => q.Module.Id == moduleId)
+                        .OrderBy(q => Guid.NewGuid())
                         .Take(countQuestions - result.Count);
 
                     if (questions.Count() == 0)
@@ -105,7 +106,7 @@ namespace med_game.src.Repository
             {
                 foreach (var module in lectern.Modules)
                 {
-                    var randomQuestions = module.Questions.OrderBy(q => EF.Functions.Random()).Take(averageCountQuestionsFromModule);
+                    var randomQuestions = module.Questions.AsEnumerable().OrderBy(q => Guid.NewGuid()).Take(averageCountQuestionsFromModule);
                     result.AddRange(randomQuestions);
 
                     if (result.Count >= countQuestions)

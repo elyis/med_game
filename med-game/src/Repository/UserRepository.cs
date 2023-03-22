@@ -538,10 +538,13 @@ namespace med_game.src.Repository
             return true;
         }
 
-        public IEnumerable<RatingInfo> GetRatingInfo()
+        public Rating GetRatingInfo()
         {
-            var ratingTable = _context.Users.OrderByDescending(u => u.Rating).Select(u => u.ToRatingInfo());
-            return ratingTable;
+            var ratingTable = _context.Users.OrderByDescending(u => u.Rating).Select(u => u.ToRatingInfo()).ToList();
+            int placeInDepartment = 1;
+            foreach(var ratingInfo in ratingTable)
+                ratingInfo.PlaceInRating = placeInDepartment++;
+            return new Rating { listPlayers = ratingTable };
         }
 
         public async Task UpdateRating(long id, int countPoints)

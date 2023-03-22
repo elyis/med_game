@@ -22,24 +22,24 @@ namespace med_game.src.Service
         {
             QuestionProperties questionProperties = new QuestionProperties 
             { 
-                Description = questionBody.Description, 
-                Image = questionBody.Image, 
-                Text = questionBody.Text, 
-                Type = questionBody.Type
+                Description = questionBody.description, 
+                Image = questionBody.image, 
+                Text = questionBody.text, 
+                Type = questionBody.type
             };
 
             var questionIsExist = await _questionRepository.GetAsync(questionProperties, module);
             if (questionIsExist != null)
                 return null;
 
-            var answers = await _answerRepository.AddRange(questionBody.Answers);
-            List<Answer> answerList = answers.ToList();
+            var answers = await _answerRepository.AddRange(questionBody.answers);
+            List<AnswerOption> answerList = answers.Select(answer => answer.ToAnswerOption()).ToList();
 
-            var rightAnswerIndex = answerList.FindIndex(a => a.ToAnswerOption().Equals(questionBody.RightAnswer));
+            var rightAnswerIndex = answerList.IndexOf(questionBody.rightAnswer);
             if(rightAnswerIndex == -1)
                 return null;
 
-            var question = await _questionRepository.AddAsync(questionBody, module, answerList, rightAnswerIndex);
+            var question = await _questionRepository.AddAsync(questionBody, module, answers.ToList(), rightAnswerIndex);
             return question;
         }
 

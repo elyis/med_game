@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -6,15 +7,15 @@ namespace med_game.src.Entities
 {
     public class AnswerOption
     {
-        public TypeAnswer Type { get; set; }
-        public string? Text { get; set; }
-        public string? Image { get; set; }
+        public TypeAnswer type { get; set; }
+        public string? text { get; set; }
+        public string? image { get; set; }
 
         public bool Equals(AnswerOption answerOption)
         {
-            if( answerOption.Type == Type && 
-                answerOption.Image == Image && 
-                answerOption.Text?.ToLower() == Text?.ToLower()
+            if( answerOption.type == type && 
+                ((answerOption.image == image) || (answerOption.image.IsNullOrEmpty() && image.IsNullOrEmpty())) &&  
+                answerOption.text?.ToLower() == text?.ToLower()
                 ) 
                 return true;
             return false;
@@ -26,5 +27,6 @@ namespace med_game.src.Entities
     {
         Image,
         Text,
+        Input
     }
 }

@@ -2,6 +2,7 @@
 using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using Xunit;
 
@@ -9,6 +10,12 @@ namespace test.Controller
 {
     public class AuthControllerTests
     {
+        private readonly ILoggerFactory _loggerFactory;
+        public AuthControllerTests(ILoggerFactory loggerFactory)
+        {
+            _loggerFactory = loggerFactory;
+        }
+
         [Fact]
         public async Task SuccessfulRegisterUser()
         {   
@@ -25,7 +32,7 @@ namespace test.Controller
                 (int) HttpStatusCode.Conflict,
             };
 
-            AuthController authController = new AuthController();
+            AuthController authController = new AuthController(_loggerFactory);
 
             var result = await authController.SignUp(registrationBody) as ObjectResult;
             Assert.NotNull(result);
@@ -44,7 +51,7 @@ namespace test.Controller
                 Password = "success"
             };
 
-            AuthController authController = new AuthController();
+            AuthController authController = new AuthController(_loggerFactory);
             var result = await authController.SignIn(login) as ObjectResult;
             Assert.NotNull(result);
             
@@ -63,7 +70,7 @@ namespace test.Controller
                 Password = "failed"
             };
 
-            AuthController authController = new AuthController();
+            AuthController authController = new AuthController(_loggerFactory);
 
 
             var result = await authController.SignIn(login) as ObjectResult;
@@ -76,8 +83,8 @@ namespace test.Controller
             var tokenPair = await SuccessfulLogin();
             Assert.NotNull(tokenPair);
 
-            var authController = new AuthController();
-            var result = await authController.RestoreToken(tokenPair) as ObjectResult;
+            var authController = new AuthController(_loggerFactory);
+            var result = await authController.RestoreToken() as ObjectResult;
             Assert.NotNull(result);
 
             Assert.Equal((int)HttpStatusCode.OK, (int)result.StatusCode!);

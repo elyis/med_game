@@ -12,6 +12,7 @@ namespace med_game.src.Managers
         private static readonly ConcurrentDictionary<long, Connection> _connections = new();
         private static int isLocked = 0;
         private static readonly AppDbContext _context = new AppDbContext();
+        private static ILogger _logger = new LoggerFactory().CreateLogger("distributor");
 
         public static bool AddConnection(long userId, Connection connection)
             => _connections.TryAdd(userId, connection);
@@ -44,7 +45,7 @@ namespace med_game.src.Managers
                     };
 
 
-                    GamingLobby lobby = new GamingLobby(roomSettings);
+                    GamingLobby lobby = new GamingLobby(roomSettings,_logger);
                     if (!lobby.GenerateQuestion())
                         await CloseAll(userIds,"Module does not contain questions", WebSocketCloseStatus.InvalidPayloadData);
 

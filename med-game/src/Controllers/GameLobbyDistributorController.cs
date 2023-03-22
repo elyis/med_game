@@ -12,7 +12,7 @@ namespace med_game.src.Controllers
     {
         private readonly IGameLobbyService _gameLobbyService;
 
-        public GameLobbyDistributorController()
+        public GameLobbyDistributorController(ILoggerFactory loggerFactory)
         {
             AppDbContext context = new AppDbContext();
             var moduleRepository = new ModuleRepository(context);
@@ -21,7 +21,9 @@ namespace med_game.src.Controllers
 
             _gameLobbyService = new GameLobbyService(lecternRepository,
                                                      moduleRepository,
-                                                     jwtUtilities);
+                                                     jwtUtilities,
+                                                     loggerFactory.CreateLogger("Game lobby")
+                                                     );
         }
 
 

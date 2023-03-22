@@ -17,14 +17,17 @@ namespace med_game.src.Service
         private readonly ILecternRepository _lecternRepository;
         private readonly IModuleRepository _moduleRepository;
         private readonly JwtUtilities _jwtUtilities;
+        private readonly ILogger _logger;
 
         public GameLobbyService(ILecternRepository lecternRepository, 
                                 IModuleRepository moduleRepository, 
-                                JwtUtilities jwtUtilities)
+                                JwtUtilities jwtUtilities,
+                                ILogger logger)
         {
             _lecternRepository = lecternRepository;
             _moduleRepository = moduleRepository;
             _jwtUtilities = jwtUtilities;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)

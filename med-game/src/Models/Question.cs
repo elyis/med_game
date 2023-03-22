@@ -1,4 +1,5 @@
 ﻿using med_game.src.Entities;
+using med_game.src.Entities.Response;
 using Microsoft.EntityFrameworkCore;
 
 namespace med_game.src.Models
@@ -21,15 +22,28 @@ namespace med_game.src.Models
         public QuestionBody ToQuestionBody()
             => new QuestionBody
             {
-                Description = Description,
-                Text = Text,
-                NumOfPointsPerAnswer = CountPointsPerAnswer,
-                Image = Image,
-                TimeSeconds = TimeSeconds,
+                description = Description,
+                text = Text,
+                numOfPointsPerAnswer = CountPointsPerAnswer,
+                image = Image == null ? "" : @$"{Constants.webPathToQuestionIcons}{Image}",
+                timeSeconds = TimeSeconds,
 
-                Type = (TypeQuestion)Enum.Parse(typeof(TypeQuestion), Type),
-                RightAnswer = Answers[(int)CorrectAnswerIndex].ToAnswerOption(),
-                Answers = Answers.Select(a => a.ToAnswerOption()).ToList(),
+                type = (TypeQuestion)Enum.Parse(typeof(TypeQuestion), Type),
+                rightAnswer = Answers[(int)CorrectAnswerIndex].ToAnswerOption(),
+                answers = Answers.Select(a => a.ToAnswerOption()).ToList(),
             };
+
+        public GameQuestion ToGameQuestion()
+           => new GameQuestion
+           {
+               description = Description,
+               text = Text,
+               image = Image == null ? "" : @$"{Constants.webPathToQuestionIcons}{Image}",
+               timeSeconds = TimeSeconds,
+
+               type = (TypeQuestion)Enum.Parse(typeof(TypeQuestion), Type),
+               rightAnswer = Answers[(int)CorrectAnswerIndex].ToAnswerOption(),
+               answers = Answers.Select(a => a.ToAnswerOption()).ToList(),
+           };
     }
 }

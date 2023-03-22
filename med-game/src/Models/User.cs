@@ -36,9 +36,10 @@ namespace med_game.src.Models
             return new RatingInfo
             {
                 Mail = Email,
-                Rating = Rating,
+                NumberPointsInRatingDepartment = Rating,
                 Image = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}",
-                Nickname = Nickname
+                Nickname = Nickname,
+                PlaceInRating = 0
             };
         }
 

@@ -16,7 +16,7 @@ namespace med_game.src.Controllers
         private readonly JwtUtilities _jwtUtilities;
 
 
-        public GameController()
+        public GameController(ILoggerFactory loggerFactory)
         {
             _jwtUtilities = new JwtUtilities();
         }

@@ -18,14 +18,14 @@ namespace med_game.src.Entities.Request
         public QuestionBody ToQuestionBody()
             => new QuestionBody 
             { 
-                Text= Text, 
-                Description = Description,
-                Image = Image, 
-                Type = TypeQuestion, 
-                TimeSeconds = TimeSeconds,
-                RightAnswer = RightAnswer, 
-                NumOfPointsPerAnswer = NumOfPointsPerAnswer, 
-                Answers = ListOfAnswers 
+                text= Text, 
+                description = Description,
+                image = Image, 
+                type = TypeQuestion, 
+                timeSeconds = TimeSeconds,
+                rightAnswer = RightAnswer, 
+                numOfPointsPerAnswer = NumOfPointsPerAnswer, 
+                answers = ListOfAnswers 
             };
     }
 }

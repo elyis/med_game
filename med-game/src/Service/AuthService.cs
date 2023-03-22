@@ -4,7 +4,6 @@ using med_game.src.Entities.Request;
 using med_game.src.Entities;
 using System.Security.Claims;
 using med_game.src.Models;
-using med_game.src.Utility;
 using med_game.src.Core.IManager;
 
 namespace med_game.src.Service

@@ -10,16 +10,9 @@ namespace med_game.src.Controllers
     public class ImageUploaderController : ControllerBase
     {
         private readonly FileUploader _fileUploader;
-
-        private readonly List<string> _validFileFormats = new()
+        public ImageUploaderController(ILoggerFactory loggerFactory)
         {
-            "image/jpeg",
-            "image/png",
-        };
-
-        public ImageUploaderController()
-        {
-            _fileUploader = new FileUploader();
+            _fileUploader = new FileUploader(loggerFactory);
         }
 
 
@@ -33,9 +26,9 @@ namespace med_game.src.Controllers
         public async Task<IActionResult> UploadAnswerIcon()
         {
             string? contentType = Request.Headers.ContentType;
-            if (contentType != null && _validFileFormats.Contains(contentType!))
+            if (contentType?.StartsWith("image/") == true)
             {
-                string? filename = await _fileUploader.UploadImage(Constants.pathToAnswerIcons, Request.Body, contentType!.Split('/').Last());
+                string? filename = await _fileUploader.UploadImage(Constants.pathToAnswerIcons, Request.Body);
                 return filename == null ? BadRequest() : Ok(filename);
             }
 
@@ -53,9 +46,9 @@ namespace med_game.src.Controllers
         public async Task<IActionResult> UploadQuestionIcon()
         {
             string? contentType = Request.Headers.ContentType;
-            if (contentType != null && _validFileFormats.Contains(contentType!))
+            if (contentType?.StartsWith("image/") == true)
             {
-                string? filename = await _fileUploader.UploadImage(Constants.pathToQuestionIcons, Request.Body, contentType!.Split('/').Last());
+                string? filename = await _fileUploader.UploadImage(Constants.pathToQuestionIcons, Request.Body);
                 return filename == null ? BadRequest() : Ok(filename);
             }
 
@@ -73,9 +66,9 @@ namespace med_game.src.Controllers
         public async Task<IActionResult> UploadAchievementIcon()
         {
             string? contentType = Request.Headers.ContentType;
-            if (contentType != null && _validFileFormats.Contains(contentType!))
+            if (contentType?.StartsWith("image/") == true)
             {
-                string? filename = await _fileUploader.UploadImage(Constants.pathToAchievementIcons, Request.Body, contentType!.Split('/').Last());
+                string? filename = await _fileUploader.UploadImage(Constants.pathToAchievementIcons, Request.Body);
                 return filename == null ? BadRequest() : Ok(filename);
             }
 
@@ -85,7 +78,6 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("answerIcon/{filename}")]
-        [Authorize]
         [ProducesResponseType(typeof(File), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
 
@@ -95,14 +87,12 @@ namespace med_game.src.Controllers
             if (bytes == null)
                 return NotFound();
 
-            string extension = filename.Split('.').Last();
-            return File(bytes, $"image/{extension}", filename);
+            return File(bytes, "image/jpeg", filename);
         }
 
 
 
         [HttpGet("questionIcon/{filename}")]
-        [Authorize]
         [ProducesResponseType(typeof(File), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
 
@@ -112,14 +102,12 @@ namespace med_game.src.Controllers
             if (bytes == null)
                 return NotFound();
 
-            string extension = filename.Split('.').Last();
-            return File(bytes, $"image/{extension}", filename);
+            return File(bytes, "image/jpeg", filename);
         }
 
 
 
         [HttpGet("achievementIcon/{filename}")]
-        [Authorize]
         [ProducesResponseType(typeof(File), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
 
@@ -129,8 +117,7 @@ namespace med_game.src.Controllers
             if (bytes == null)
                 return NotFound();
 
-            string extension = filename.Split('.').Last();
-            return File(bytes, $"image/{extension}", filename);
+            return File(bytes, "image/jpeg", filename);
         }
     }
 }

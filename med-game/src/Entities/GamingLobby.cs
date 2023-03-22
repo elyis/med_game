@@ -13,21 +13,24 @@ namespace med_game.src.Entities
 {
     public class GamingLobby
     {
-        public GamingLobby(RoomSettings roomSettings, int countQuestions = 3)
+        private readonly IUserRepository _userRepository;
+        private readonly ILogger _logger;
+
+        public GamingLobby(RoomSettings roomSettings, ILogger logger, int countQuestions = 3)
         {
             RoomSettings = roomSettings;
             CountQuestions = countQuestions;
 
             Random rnd = new();
             countPointsForWin = rnd.Next(8, 12);
-            countPointsForLose = rnd.Next(3, 6);
+            countPointsForLose = -rnd.Next(3, 6);
+
             _userRepository = new UserRepository(new AppDbContext());
+            _logger = logger;
         }
 
-        private readonly IUserRepository _userRepository;
         public string Id { get; } = Guid.NewGuid().ToString();
         public RoomSettings RoomSettings { get; }
-
 
         public int CountQuestions { get; private set; }
         public int CurrentQuestionIndex { get; private set; }
@@ -121,6 +124,10 @@ namespace med_game.src.Entities
                     }
 
                 }
+                catch(WebSocketException e)
+                {
+                    _logger.LogError(e.Message);
+                }
                 catch (Exception ex)
                 {
                     await CloseAll(WebSocketCloseStatus.InternalServerError, ex.Message);
@@ -153,7 +160,7 @@ namespace med_game.src.Entities
         {
             MaxPointsByQuestions = Questions.Select(e => e.CountPointsPerAnswer).Sum();
             foreach(var player in Players)
-                player.Value.Statistics.MaxPoints = MaxPointsByQuestions;
+                player.Value.Statistics.maxPointsGame = MaxPointsByQuestions;
 
             await SendStateGameAndQuestionToEveryone();
             isLobbyRunning = 1;
@@ -176,7 +183,7 @@ namespace med_game.src.Entities
                 foreach (var player in Players)
                 {
                     Interlocked.Exchange(ref player.Value.IsPlayerAnswer, 0);
-                    player.Value.Statistics.PointGain = 0;
+                    player.Value.Statistics.pointGain = 0;
                 }
 
                 isAnsweredCorrectlyFirst = 0;
@@ -215,7 +222,7 @@ namespace med_game.src.Entities
 
         private async Task SendQuestionToEveryone()
         {
-            QuestionBody question = GetQuestionBody();  
+            var question = GetGameQuestion();  
             await SendAll(question);
         }
 
@@ -224,7 +231,10 @@ namespace med_game.src.Entities
             StateGame stateGame = GetGameStatistics(winner);
             await SendAll(stateGame);
             if (winner != null)
+            {
+                isResultSent = 1;
                 await CloseAll(WebSocketCloseStatus.NormalClosure, $"Questions {CurrentQuestionIndex}/{CountQuestions}");
+            }
 
         }
 
@@ -242,11 +252,11 @@ namespace med_game.src.Entities
             var question = Questions[CurrentQuestionIndex - 1];
             if (answer.Equals(question.Answers[(int)question.CorrectAnswerIndex].ToAnswerOption()))
             {
-                Players[userId].Statistics.PointGain = question.CountPointsPerAnswer;
+                Players[userId].Statistics.pointGain = question.CountPointsPerAnswer;
                 if(Interlocked.CompareExchange(ref isAnsweredCorrectlyFirst, 1, 0) == 0)
-                    Players[userId].Statistics.PointGain += countPointsForRightAnswer;
+                    Players[userId].Statistics.pointGain += countPointsForRightAnswer;
 
-                Players[userId].Statistics.CountPoints += Players[userId].Statistics.PointGain;
+                Players[userId].Statistics.countOfPoints += Players[userId].Statistics.pointGain;
             }
 
             Players[userId].IsPlayerAnswer = 1;
@@ -257,28 +267,28 @@ namespace med_game.src.Entities
         {
             return new StateGame
             {
-                IsEndGame = winner != null,
-                Statistics = Players.Select(player => player.Value.Statistics).ToList(),
-                WinnerName = winner
+                isEndGame = winner != null,
+                rating = Players.Select(player => player.Value.Statistics).ToList(),
+                nameWinner = winner
             };
         }
 
-        private QuestionBody GetQuestionBody()
+        private GameQuestion GetGameQuestion()
         {
             var question = Questions[CurrentQuestionIndex];
             CurrentQuestionIndex++;
-            return question.ToQuestionBody();
+            return question.ToGameQuestion();
         }
 
         private async Task<string> GetWinner()
         {
-            var winner = Players.MaxBy(player => player.Value.Statistics.CountPoints);
-            var loser = Players.MinBy(player => player.Value.Statistics.CountPoints);
+            var winner = Players.MaxBy(player => player.Value.Statistics.countOfPoints);
+            var loser = Players.MinBy(player => player.Value.Statistics.countOfPoints);
 
 
             if (RoomSettings.Type == TypeBattle.Rating)
             {
-                if (winner.Value.Statistics.CountPoints == loser.Value.Statistics.CountPoints)
+                if (winner.Value.Statistics.countOfPoints == loser.Value.Statistics.countOfPoints)
                 {
                     await _userRepository.UpdateRating(winner.Key, countPointsForWin / 2);
                     await _userRepository.UpdateRating(loser.Key, countPointsForWin / 2);
@@ -290,7 +300,7 @@ namespace med_game.src.Entities
                 }
             }
 
-            return winner.Value.Statistics.Nickname;
+            return winner.Value.Statistics.nickname;
         }
     }
 }

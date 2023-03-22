@@ -1,4 +1,5 @@
 ﻿using med_game.Models;
+using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using med_game.src.Entities.Response;
 using med_game.src.models;
@@ -11,8 +12,6 @@ namespace med_game.src.Core.IRepository
         Task<User?> AddAsync(RegistrationBody registrationBody, string role);
         Task<User?> GetAsync(long id);
         Task<User?> GetAsync(string email);
-        Task<User?> GetByToken(string refreshTokenHash);
-
         Task<User?> GetSubscribersAsync(long id);
         Task<User?> GetSubscribersAsync(string email);
 
@@ -23,7 +22,6 @@ namespace med_game.src.Core.IRepository
 
         Task<bool> UpdateTokenAsync(string refreshTokenHash, long id);
         Task<bool> UpdateTokenAsync(string refreshToken, string email);
-
         Task<bool> UpdateImageAsync(long id, string filename);
         Task<bool> UpdateImageAsync(string email, string filename);
 
@@ -52,7 +50,8 @@ namespace med_game.src.Core.IRepository
 
         Task<ProfileBody?> GetProfileAsync(long id);
         Task<ProfileBody?> GetProfileAsync(string email);
-        IEnumerable<RatingInfo> GetRatingInfo();
+        Task<User?> GetByToken(string refreshTokenHash);
+        Rating GetRatingInfo();
         Task UpdateRating(long id, int countPoints);
     }
 }

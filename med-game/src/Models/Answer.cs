@@ -17,9 +17,9 @@ namespace med_game.src.Models
         public AnswerOption ToAnswerOption()
             => new AnswerOption
             {
-                Text = Description,
-                Type = (TypeAnswer)Enum.Parse(typeof(TypeAnswer), Type),
-                Image = Image
+                text = Description,
+                type = (TypeAnswer)Enum.Parse(typeof(TypeAnswer), Type),
+                image = Image == null ? "" : @$"{Constants.webPathToAnswerIcons}{Image}"
             };
     }
 }
