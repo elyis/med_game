@@ -29,14 +29,10 @@ namespace med_game.src.Managers
         }
         public TokenPair GenerateTokenPair(List<Claim> claims)
         {
-            string accessToken = GenerateAccessToken(claims);
-            string refreshToken = GenerateRefreshToken();
-
-            return new TokenPair
-            {
-                Access_token = $"Bearer {accessToken}",
-                Refresh_token = refreshToken
-            };
+            return new TokenPair(
+                accessToken: GenerateAccessToken(claims),
+                refreshToken: GenerateRefreshToken()
+                );
         }
 
         public string GenerateAccessToken(List<Claim> claims)

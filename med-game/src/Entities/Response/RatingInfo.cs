@@ -5,6 +5,6 @@
         public string Mail { get; set; }
         public string Nickname { get; set; }
         public int Rating { get; set; }
-        public string? Image { get; set; }
+        public string Image { get; set; }
     }
 }

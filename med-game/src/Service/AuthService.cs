@@ -12,12 +12,10 @@ namespace med_game.src.Service
     public class AuthService : IAuthService
     {
         private readonly IJwtManager _jwtManager;
-        private readonly JwtUtilities _jwtUtilities;
         private readonly IUserRepository _userRepository;
 
         public AuthService(IJwtManager jwtManager, IUserRepository userRepository)
         {
-            _jwtUtilities = new JwtUtilities();
             _jwtManager = jwtManager;
             _userRepository = userRepository;
         }
@@ -80,11 +78,10 @@ namespace med_game.src.Service
                     new Claim(ClaimTypes.Role, user.RoleName)
                 };
 
-            TokenPair tokenPair = new TokenPair
-            {
-                Access_token = _jwtManager.GenerateAccessToken(claims),
-                Refresh_token = refreshToken
-            };
+            TokenPair tokenPair = new TokenPair(
+                    accessToken: _jwtManager.GenerateAccessToken(claims),
+                    refreshToken: refreshToken
+                );
 
             if (user.TokenValidBefore < DateTime.UtcNow)
                 tokenPair.Refresh_token = _jwtManager.GenerateRefreshToken();

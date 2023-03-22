@@ -424,7 +424,7 @@ namespace med_game.src.Repository
             if (user != null)
             {
                 var playersByRating = _context.Users.
-                        Where(u => EF.Functions.Like(u.Nickname, $"%{nicknamePattern}%"))
+                        Where(u => EF.Functions.Like(u.Nickname.ToLower(), $"%{nicknamePattern.ToLower()}%"))
                         .OrderByDescending(u => u.Rating);
 
                 if(playersByRating.Count() > 0)

@@ -6,7 +6,7 @@ namespace med_game.src.Entities.Response
     {
         public string Email { get; set; }
         public string Name { get; set; }
-        public string? Icon { get; set; }
+        public string Icon { get; set; }
         public int NumberPointsInRatingDepartment { get; set; }
         public Department Department { get; set; }
         public int PlaceInRatingDepartment { get; set; }

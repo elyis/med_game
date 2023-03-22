@@ -37,7 +37,7 @@ namespace med_game.src.Models
             {
                 Mail = Email,
                 Rating = Rating,
-                Image = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
+                Image = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}",
                 Nickname = Nickname
             };
         }
@@ -58,7 +58,7 @@ namespace med_game.src.Models
             return new UserInfo
             {
                 Email = Email,
-                Icon = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
+                Icon = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}",
                 Name = Nickname,
                 Status = status,
                 NumberPointsInRatingDepartment = Rating,
@@ -71,7 +71,7 @@ namespace med_game.src.Models
             return new FriendInfo
             {
                 Email = Email,
-                Icon = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}",
+                Icon = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}",
                 Name = Nickname,
                 Status = status,
                 NumberPointsInRatingDepartment = Rating,
@@ -84,7 +84,7 @@ namespace med_game.src.Models
             return new GameStatisticInfo
             {
                 Nickname = Nickname,
-                Image = Image == null ? null : @$"{Constants.webPathToProfileIcons}{Image}"
+                Image = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}"
             };
         }
 
