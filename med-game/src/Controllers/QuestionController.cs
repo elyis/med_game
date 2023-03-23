@@ -1,11 +1,9 @@
 ﻿using med_game.src.Core.IRepository;
-using med_game.src.Core.IService;
 using med_game.src.Data;
 using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using med_game.src.Models;
 using med_game.src.Repository;
-using med_game.src.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -15,22 +13,20 @@ namespace med_game.src.Controllers
     [ApiController]
     public class QuestionController : ControllerBase
     {
-        private readonly IQuestionService _questionService;
-
         private readonly IModuleRepository _moduleRepository;
         private readonly IAnswerRepository _answerRepository;
         private readonly IQuestionRepository _questionRepository;
 
-        public QuestionController()
+        private readonly ILogger _logger;
+
+        public QuestionController(ILoggerFactory loggerFactory)
         {
             AppDbContext context = new AppDbContext();
 
             _moduleRepository = new ModuleRepository(context);
             _answerRepository = new AnswerRepository(context);
             _questionRepository = new QuestionRepository(context);
-
-
-            _questionService = new QuestionService(_answerRepository, _questionRepository);
+            _logger = loggerFactory.CreateLogger<QuestionController>();
         }
 
 
@@ -45,8 +41,24 @@ namespace med_game.src.Controllers
             if (module == null)
                 return NotFound("Module not found");
 
-            var result = await _questionService.AddAsync(questionBody.ToQuestionBody(), module);
-            return result == null ? Conflict() : Ok();
+            QuestionProperties questionProperties = questionBody.ToQuestionProperties();
+            var questionIsExist = await _questionRepository.GetAsync(questionProperties, module);
+            if (questionIsExist != null)
+                return Conflict("question is exist");
+
+            if (questionBody.ListOfAnswers.FindIndex(q => q.Equals(questionBody.RightAnswer)) == -1)
+                return BadRequest("answers doesn't contain right answer");
+
+            var answers = await _answerRepository.AddRange(questionBody.ListOfAnswers);
+            List<AnswerOption> answerList = answers.Select(answer => answer.ToAnswerOption()).ToList();
+
+            var rightAnswerIndex = answerList.FindIndex(q => q.Equals(questionBody.RightAnswer));
+            if (rightAnswerIndex == -1)
+                return BadRequest();
+
+            var question = await _questionRepository.AddAsync(questionBody.ToQuestionBody(), module, answers.ToList(), rightAnswerIndex);
+            _logger.LogInformation($"Question added? : {question}");
+            return question == null ? Conflict() : Ok();
         }
 
 

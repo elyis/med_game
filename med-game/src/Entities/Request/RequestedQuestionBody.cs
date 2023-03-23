@@ -1,4 +1,6 @@
 ﻿
+using static System.Net.Mime.MediaTypeNames;
+
 namespace med_game.src.Entities.Request
 {
     public class RequestedQuestionBody
@@ -27,5 +29,16 @@ namespace med_game.src.Entities.Request
                 numOfPointsPerAnswer = NumOfPointsPerAnswer, 
                 answers = ListOfAnswers 
             };
+
+        public QuestionProperties ToQuestionProperties()
+        {
+            return new QuestionProperties
+            {
+                Description = Description,
+                Image = Image,
+                Text = Text,
+                Type = TypeQuestion
+            };
+        }
     }
 }

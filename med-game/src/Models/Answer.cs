@@ -15,11 +15,8 @@ namespace med_game.src.Models
         public List<Question> Questions { get; set; } = new();
 
         public AnswerOption ToAnswerOption()
-            => new AnswerOption
-            {
-                text = Description,
-                type = (TypeAnswer)Enum.Parse(typeof(TypeAnswer), Type),
-                image = Image == null ? "" : @$"{Constants.webPathToAnswerIcons}{Image}"
-            };
+            => new AnswerOption(type: (TypeAnswer)Enum.Parse(typeof(TypeAnswer), Type),
+                                text: Description,
+                                image: Image);
     }
 }

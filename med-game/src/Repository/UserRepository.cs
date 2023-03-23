@@ -502,7 +502,7 @@ namespace med_game.src.Repository
                 .Include(u => u.Achievements)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            return user == null ? null : user.ToProfileBody();
+            return user?.ToProfileBody();
         }
 
         public async Task<ProfileBody?> GetProfileAsync(string email)
@@ -511,7 +511,7 @@ namespace med_game.src.Repository
                 .Include(u => u.Achievements)
                 .FirstOrDefaultAsync(u => u.Email == email);
 
-            return user == null ? null : user.ToProfileBody();
+            return user?.ToProfileBody();
         }
 
         public async Task<bool> UpdateImageAsync(long id, string filename)

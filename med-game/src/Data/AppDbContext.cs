@@ -56,6 +56,7 @@ namespace med_game.src.Data
                     .HasForeignKey(f => f.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
         }
     }
 
