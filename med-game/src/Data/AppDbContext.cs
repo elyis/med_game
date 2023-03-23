@@ -1,5 +1,5 @@
 ﻿using med_game.Models;
-using med_game.src.Entities;
+using med_game.src.Entities.Game;
 using med_game.src.models;
 using med_game.src.Models;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +56,6 @@ namespace med_game.src.Data
                     .HasForeignKey(f => f.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
-
         }
     }
 

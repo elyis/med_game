@@ -1,7 +1,7 @@
 ﻿using med_game.src.Entities.Response;
 using System.Net.WebSockets;
 
-namespace med_game.src.Entities
+namespace med_game.src.Entities.Game
 {
     public class GameSession
     {

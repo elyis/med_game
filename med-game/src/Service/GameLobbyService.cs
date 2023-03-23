@@ -1,7 +1,6 @@
 ﻿using med_game.src.Core.IRepository;
 using med_game.src.Core.IService;
 using med_game.src.Entities.Request;
-using med_game.src.Entities;
 using med_game.src.Managers;
 using med_game.src.Models;
 using med_game.src.Utility;
@@ -9,6 +8,7 @@ using Newtonsoft.Json;
 using System.Net.WebSockets;
 using System.Text;
 using System.Net;
+using med_game.src.Entities.Game;
 
 namespace med_game.src.Service
 {
@@ -103,7 +103,7 @@ namespace med_game.src.Service
 
                 catch(WebSocketException ex)
                 {
-
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.EndpointUnavailable, ex.Message, CancellationToken.None);
                 }
 
                 catch (Exception ex)

@@ -10,8 +10,7 @@ namespace med_game.src.Entities
         {
             this.type = type;
             this.text = text;
-            this.image = image.IsNullOrEmpty() ? "" : @$"{Constants.webPathToAnswerIcons}{image}";
-
+            this.image = image.IsNullOrEmpty() ? "" : image;
         }
 
         public TypeAnswer type { get; private set; }
@@ -21,11 +20,16 @@ namespace med_game.src.Entities
         public bool Equals(AnswerOption answerOption)
         {
             if( answerOption.type == type && 
-                (answerOption.image == image || (image.IsNullOrEmpty() && answerOption.image.IsNullOrEmpty())) &&  
+                answerOption.image == image &&  
                 answerOption.text?.ToLower() == text?.ToLower()
                 ) 
                 return true;
             return false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as AnswerOption);
         }
     }
 

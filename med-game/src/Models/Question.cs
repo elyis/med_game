@@ -30,7 +30,7 @@ namespace med_game.src.Models
 
                 type = (TypeQuestion)Enum.Parse(typeof(TypeQuestion), Type),
                 rightAnswer = Answers[(int)CorrectAnswerIndex].ToAnswerOption(),
-                answers = Answers.Select(a => a.ToAnswerOption()).ToList(),
+                answers = Answers.Select(a => a.ToAnswerOptionWithWebPath()).ToList(),
             };
 
         public GameQuestion ToGameQuestion()
@@ -43,7 +43,7 @@ namespace med_game.src.Models
 
                type = (TypeQuestion)Enum.Parse(typeof(TypeQuestion), Type),
                rightAnswer = Answers[(int)CorrectAnswerIndex].ToAnswerOption(),
-               answers = Answers.Select(a => a.ToAnswerOption()).ToList(),
+               answers = Answers.Select(a => a.ToAnswerOptionWithWebPath()).ToList(),
            };
     }
 }

@@ -18,5 +18,11 @@ namespace med_game.src.Models
             => new AnswerOption(type: (TypeAnswer)Enum.Parse(typeof(TypeAnswer), Type),
                                 text: Description,
                                 image: Image);
+
+        public AnswerOption ToAnswerOptionWithWebPath()
+            => new AnswerOption(type: (TypeAnswer)Enum.Parse(typeof(TypeAnswer), Type),
+                                text: Description,
+                                image: @$"{Constants.webPathToProfileIcons}{Image}"
+                );
     }
 }

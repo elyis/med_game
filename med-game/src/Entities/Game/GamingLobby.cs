@@ -6,10 +6,11 @@ using med_game.src.Models;
 using med_game.src.Repository;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using System.Diagnostics.Eventing.Reader;
 using System.Net.WebSockets;
 using System.Text;
 
-namespace med_game.src.Entities
+namespace med_game.src.Entities.Game
 {
     public class GamingLobby
     {
@@ -56,7 +57,7 @@ namespace med_game.src.Entities
         public bool AddPlayer(long userId, WebSocket webSocket)
         {
             var gameStatistic = PlayerInfo[userId];
-            if(gameStatistic != null)
+            if (gameStatistic != null)
             {
                 GameSession session = new(webSocket, new GameStatistics(gameStatistic.Nickname, gameStatistic.Image));
                 return Players.TryAdd(userId, session);
@@ -74,7 +75,7 @@ namespace med_game.src.Entities
         {
             IQuestionRepository questionRepository = new QuestionRepository(new AppDbContext());
             var questions = questionRepository.GenerateRandomQuestions(RoomSettings.LecternId, RoomSettings.ModuleId, CountQuestions);
-            if(questions ==  null)
+            if (questions == null)
                 return false;
 
             Questions = questions.ToList();
@@ -97,42 +98,68 @@ namespace med_game.src.Entities
 
                 try
                 {
-                    AnswerOption? answer = null;
                     while (webSocket.State == WebSocketState.Open && isLobbyRunning == 1)
                     {
                         if (Players[userId].IsPlayerAnswer == 0)
                         {
-                            answer = await ReceiveJson<AnswerOption>(webSocket) ?? throw new JsonSerializationException();
-                            PlayerAnswer(answer, userId);
+                            var task = ReceiveJson<AnswerOption>(webSocket);
+                            if(await Task.WhenAny(task, Task.Delay(Questions[CurrentQuestionIndex - 1].TimeSeconds * 1000)) == task){
+                                PlayerAnswer(await task, userId);
 
-                            if (countAnswering == Players.Count)
-                            {
-                                if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                if (countAnswering == Players.Count)
                                 {
-                                    await SendStateGameAndQuestionToEveryone();
-                                    countAnswering = 0;
-                                    Interlocked.Exchange(ref isManaged, 0);
+                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                    {
+                                        await SendStateGameAndQuestionToEveryone();
+                                        countAnswering = 0;
+                                        Interlocked.Exchange(ref isManaged, 0);
+                                    }
+                                    else
+                                        await Task.Delay(2000);
                                 }
                                 else
                                     await Task.Delay(2000);
                             }
                             else
-                                await Task.Delay(2000);
+                            {
+                                _logger.LogCritical($"{task.Status}");
+
+                                _logger.LogCritical($"{Players[userId].Statistics.nickname}: operation cancelled");
+                                Interlocked.Increment(ref countAnswering);
+                                if (countAnswering == Players.Count)
+                                {
+                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                    {
+                                        await SendStateGameAndQuestionToEveryone();
+                                        countAnswering = 0;
+                                        Interlocked.Exchange(ref isManaged, 0);
+                                    }
+                                    else
+                                        await Task.Delay(2000);
+                                }
+                                else
+                                    await Task.Delay(2000);
+
+                            }
+                            
                         }
                         else
                             await Task.Delay(2000);
                     }
 
                 }
-                catch(WebSocketException e)
+                catch (WebSocketException e)
                 {
-                    _logger.LogError(e.Message);
+                    await ConsiderDefeat(userId);
+                    _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.Message}");
+                    _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.WebSocketErrorCode}");
                 }
                 catch (Exception ex)
                 {
                     await CloseAll(WebSocketCloseStatus.InternalServerError, ex.Message);
                 }
             }
+
             catch (Exception ex)
             {
                 await webSocket.CloseOutputAsync(WebSocketCloseStatus.InternalServerError, ex.Message, CancellationToken.None);
@@ -140,26 +167,24 @@ namespace med_game.src.Entities
             }
             finally
             {
-                if (Players.Count == 1)
-                    GlobalVariables.GamingLobbies.Remove(Id, out _);
-                else
+                if (Interlocked.CompareExchange(ref isResultSent, 1, 0) == 0)
                 {
-                    if (Interlocked.CompareExchange(ref isResultSent, 1, 0) == 0)
-                    {
-                        string winner = await GetWinner();
-                        await SendStateGameToEveryone(winner);
-                    }
-                    else
-                        await Task.Delay(500);
+                    string winner = await GetWinner();
+                    await SendStateGameToEveryone(winner);
                 }
+                else
+                    await Task.Delay(500);
+
                 RemovePlayer(userId);
+                if (Players.Count <= 1)
+                    GlobalVariables.GamingLobbies.Remove(Id, out _);
             }
         }
 
         private async Task Start()
         {
             MaxPointsByQuestions = Questions.Select(e => e.CountPointsPerAnswer).Sum();
-            foreach(var player in Players)
+            foreach (var player in Players)
                 player.Value.Statistics.maxPointsGame = MaxPointsByQuestions;
 
             await SendStateGameAndQuestionToEveryone();
@@ -169,7 +194,7 @@ namespace med_game.src.Entities
 
         private async Task SendStateGameAndQuestionToEveryone()
         {
-            if(CurrentQuestionIndex == CountQuestions)
+            if (CurrentQuestionIndex == CountQuestions)
             {
                 string winner = await GetWinner();
                 await SendStateGameToEveryone(winner);
@@ -196,7 +221,7 @@ namespace med_game.src.Entities
 
             WebSocketReceiveResult? result = null;
             MemoryStream memoryStream = new();
-
+            
             do
             {
                 result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
@@ -213,16 +238,16 @@ namespace med_game.src.Entities
             return JsonConvert.DeserializeObject<T?>(Encoding.UTF8.GetString(memoryStream.ToArray()));
         }
 
-        private async Task SendAll<T> (T jsonMessage)
+        private async Task SendAll<T>(T jsonMessage)
         {
             string message = JsonConvert.SerializeObject(jsonMessage);
-            foreach(var player in Players)
+            foreach (var player in Players)
                 await player.Value.WebSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
         private async Task SendQuestionToEveryone()
         {
-            var question = GetGameQuestion();  
+            var question = GetGameQuestion();
             await SendAll(question);
         }
 
@@ -240,9 +265,9 @@ namespace med_game.src.Entities
 
         private async Task CloseAll(WebSocketCloseStatus status, string? description)
         {
-            foreach(var player in Players)
+            foreach (var player in Players)
             {
-                if(player.Value.WebSocket.State == WebSocketState.Open || player.Value.WebSocket.State == WebSocketState.CloseReceived)
+                if (player.Value.WebSocket.State == WebSocketState.Open || player.Value.WebSocket.State == WebSocketState.CloseReceived)
                     await player.Value.WebSocket.CloseOutputAsync(status, description, CancellationToken.None);
             }
         }
@@ -250,10 +275,10 @@ namespace med_game.src.Entities
         private void PlayerAnswer(AnswerOption answer, long userId)
         {
             var question = Questions[CurrentQuestionIndex - 1];
-            if (answer.Equals(question.Answers[(int)question.CorrectAnswerIndex].ToAnswerOption()))
+            if (answer.Equals(question.Answers[(int)question.CorrectAnswerIndex].ToAnswerOptionWithWebPath()))
             {
                 Players[userId].Statistics.pointGain = question.CountPointsPerAnswer;
-                if(Interlocked.CompareExchange(ref isAnsweredCorrectlyFirst, 1, 0) == 0)
+                if (Interlocked.CompareExchange(ref isAnsweredCorrectlyFirst, 1, 0) == 0)
                     Players[userId].Statistics.pointGain += countPointsForRightAnswer;
 
                 Players[userId].Statistics.countOfPoints += Players[userId].Statistics.pointGain;
@@ -280,27 +305,55 @@ namespace med_game.src.Entities
             return question.ToGameQuestion();
         }
 
+        /*
+         * Рассчитывает очки для отключившихся игроков
+         */
+
+        private async Task ConsiderDefeat(long userId)
+        {
+            Players.Remove(userId, out _);
+            await _userRepository.UpdateRating(userId, countPointsForLose);
+        }
+
+
+        /*
+         * Рассчитывает очки для не отключившихся игроков
+         */
         private async Task<string> GetWinner()
         {
-            var winner = Players.MaxBy(player => player.Value.Statistics.countOfPoints);
-            var loser = Players.MinBy(player => player.Value.Statistics.countOfPoints);
+            var pointsByWinner = Players.MaxBy(player => player.Value.Statistics.countOfPoints).Value.Statistics.countOfPoints;
+
+            var winners = Players.Where(player => 
+                    player.Value.Statistics.countOfPoints == pointsByWinner && 
+                    player.Value.WebSocket.State != WebSocketState.Aborted
+            );
+
+
+            var losers = Players.Where(player =>
+                    !winners.Contains(player) &&
+                    player.Value.WebSocket.State != WebSocketState.Aborted
+            );
 
 
             if (RoomSettings.Type == TypeBattle.Rating)
             {
-                if (winner.Value.Statistics.countOfPoints == loser.Value.Statistics.countOfPoints)
+                if (winners.ToHashSet().SetEquals(losers))
                 {
-                    await _userRepository.UpdateRating(winner.Key, countPointsForWin / 2);
-                    await _userRepository.UpdateRating(loser.Key, countPointsForWin / 2);
+                    foreach (var player in winners)
+                        await _userRepository.UpdateRating(player.Key, countPointsForWin / 2);
+                    foreach(var player in losers)
+                        await _userRepository.UpdateRating(player.Key, countPointsForWin / 2);
                 }
                 else
                 {
-                    await _userRepository.UpdateRating(winner.Key, countPointsForWin);
-                    await _userRepository.UpdateRating(loser.Key, countPointsForLose);
+                    foreach (var player in winners)
+                        await _userRepository.UpdateRating(player.Key,  countPointsForWin);
+                    foreach (var player in losers)
+                        await _userRepository.UpdateRating(player.Key, countPointsForLose);
                 }
             }
 
-            return winner.Value.Statistics.nickname;
+            return winners.First().Value.Statistics.nickname;
         }
     }
 }

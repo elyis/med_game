@@ -1,5 +1,6 @@
 ﻿using med_game.Models;
 using med_game.src.Entities;
+using med_game.src.Entities.Game;
 using med_game.src.Entities.Response;
 using med_game.src.models;
 using Microsoft.EntityFrameworkCore;
@@ -35,9 +36,9 @@ namespace med_game.src.Models
         {
             return new RatingInfo
             {
-                Mail = Email,
+                email = Email,
                 NumberPointsInRatingDepartment = Rating,
-                Image = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}",
+                icon = Image == null ? "" : @$"{Constants.webPathToProfileIcons}{Image}",
                 Nickname = Nickname,
                 PlaceInRating = 0
             };

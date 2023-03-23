@@ -1,6 +1,6 @@
 ﻿using med_game.src.Entities.Request;
 
-namespace med_game.src.Entities
+namespace med_game.src.Entities.Game
 {
     public class RoomSettings
     {
@@ -11,8 +11,8 @@ namespace med_game.src.Entities
 
         public bool Equals(RoomSettings roomSettings)
         {
-            if(roomSettings.LecternId == LecternId && 
-               roomSettings.ModuleId == ModuleId && 
+            if (roomSettings.LecternId == LecternId &&
+               roomSettings.ModuleId == ModuleId &&
                roomSettings.Type == Type)
                 return true;
             return false;

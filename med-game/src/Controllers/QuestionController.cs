@@ -39,15 +39,15 @@ namespace med_game.src.Controllers
         {
             Module? module = await _moduleRepository.GetAsync(questionBody.LecternName, questionBody.ModuleName);
             if (module == null)
-                return NotFound("Module not found");
+                return NotFound();
 
             QuestionProperties questionProperties = questionBody.ToQuestionProperties();
             var questionIsExist = await _questionRepository.GetAsync(questionProperties, module);
             if (questionIsExist != null)
-                return Conflict("question is exist");
+                return Conflict();
 
             if (questionBody.ListOfAnswers.FindIndex(q => q.Equals(questionBody.RightAnswer)) == -1)
-                return BadRequest("answers doesn't contain right answer");
+                return BadRequest();
 
             var answers = await _answerRepository.AddRange(questionBody.ListOfAnswers);
             List<AnswerOption> answerList = answers.Select(answer => answer.ToAnswerOption()).ToList();
@@ -57,7 +57,6 @@ namespace med_game.src.Controllers
                 return BadRequest();
 
             var question = await _questionRepository.AddAsync(questionBody.ToQuestionBody(), module, answers.ToList(), rightAnswerIndex);
-            _logger.LogInformation($"Question added? : {question}");
             return question == null ? Conflict() : Ok();
         }
 

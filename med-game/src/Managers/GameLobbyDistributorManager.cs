@@ -1,9 +1,9 @@
-﻿using med_game.src.Entities;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using med_game.src.Data;
 using med_game.src.Models;
+using med_game.src.Entities.Game;
 
 namespace med_game.src.Managers
 {
@@ -12,7 +12,7 @@ namespace med_game.src.Managers
         private static readonly ConcurrentDictionary<long, Connection> _connections = new();
         private static int isLocked = 0;
         private static readonly AppDbContext _context = new AppDbContext();
-        private static ILogger _logger = new LoggerFactory().CreateLogger("distributor");
+        private static ILogger _logger = LoggerFactory.Create(config => config.AddConsole()).CreateLogger("distributor");
 
         public static bool AddConnection(long userId, Connection connection)
             => _connections.TryAdd(userId, connection);
