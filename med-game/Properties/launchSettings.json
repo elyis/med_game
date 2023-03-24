@@ -1,6 +1,17 @@
 {
   "profiles": {
-    "http": {
+    "http_home": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://192.168.1.165:5121"
+    },
+
+    "http_lab": {
       "commandName": "Project",
       "launchBrowser": false,
       "launchUrl": "swagger",
@@ -10,6 +21,8 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://192.168.101.95:5121"
     },
+
+
     "https": {
       "commandName": "Project",
       "launchBrowser": false,

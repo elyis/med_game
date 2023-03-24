@@ -6,7 +6,6 @@ using med_game.src.Models;
 using med_game.src.Repository;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
-using System.Diagnostics.Eventing.Reader;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -102,44 +101,57 @@ namespace med_game.src.Entities.Game
                     {
                         if (Players[userId].IsPlayerAnswer == 0)
                         {
-                            var task = ReceiveJson<AnswerOption>(webSocket);
-                            if(await Task.WhenAny(task, Task.Delay(Questions[CurrentQuestionIndex - 1].TimeSeconds * 1000)) == task){
-                                PlayerAnswer(await task, userId);
-
-                                if (countAnswering == Players.Count)
-                                {
-                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                                    {
-                                        await SendStateGameAndQuestionToEveryone();
-                                        countAnswering = 0;
-                                        Interlocked.Exchange(ref isManaged, 0);
-                                    }
-                                    else
-                                        await Task.Delay(2000);
-                                }
-                                else
-                                    await Task.Delay(2000);
-                            }
-                            else
+                            try
                             {
-                                _logger.LogCritical($"{task.Status}");
+                                using var source = new CancellationTokenSource();
+                                var token = source.Token;
 
-                                _logger.LogCritical($"{Players[userId].Statistics.nickname}: operation cancelled");
-                                Interlocked.Increment(ref countAnswering);
-                                if (countAnswering == Players.Count)
+                                var task = ReceiveJson<AnswerOption>(webSocket, token);
+                                if (await Task.WhenAny(task, Task.Delay(10 * 1000)) == task)
                                 {
-                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                    PlayerAnswer(task.Result, userId);
+
+                                    if (countAnswering == Players.Count)
                                     {
-                                        await SendStateGameAndQuestionToEveryone();
-                                        countAnswering = 0;
-                                        Interlocked.Exchange(ref isManaged, 0);
+                                        if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                        {
+                                            await SendStateGameAndQuestionToEveryone();
+                                            countAnswering = 0;
+                                            Interlocked.Exchange(ref isManaged, 0);
+                                        }
+                                        else
+                                            await Task.Delay(2000);
                                     }
                                     else
                                         await Task.Delay(2000);
                                 }
                                 else
-                                    await Task.Delay(2000);
+                                {
+                                    _logger.LogCritical($"{task.Status}");
 
+                                    _logger.LogCritical($"{Players[userId].Statistics.nickname}: operation cancelled");
+                                    Interlocked.Increment(ref countAnswering);
+                                    if (countAnswering == Players.Count)
+                                    {
+                                        if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                        {
+                                            await SendStateGameAndQuestionToEveryone();
+                                            countAnswering = 0;
+                                            Interlocked.Exchange(ref isManaged, 0);
+                                        }
+                                        else
+                                            await Task.Delay(2000);
+                                    }
+                                    else
+                                        await Task.Delay(2000);
+                                }
+                            }
+                            catch (WebSocketException e)
+                            {
+                                
+                                await ConsiderDefeat(userId);
+                                _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.Message}");
+                                _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.WebSocketErrorCode}");
                             }
                             
                         }
@@ -147,12 +159,6 @@ namespace med_game.src.Entities.Game
                             await Task.Delay(2000);
                     }
 
-                }
-                catch (WebSocketException e)
-                {
-                    await ConsiderDefeat(userId);
-                    _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.Message}");
-                    _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.WebSocketErrorCode}");
                 }
                 catch (Exception ex)
                 {
@@ -215,7 +221,7 @@ namespace med_game.src.Entities.Game
             }
         }
 
-        private async Task<T?> ReceiveJson<T>(WebSocket webSocket)
+        private async Task<T?> ReceiveJson<T>(WebSocket webSocket, CancellationToken token)
         {
             byte[] buffer = new byte[2048];
 
@@ -224,7 +230,7 @@ namespace med_game.src.Entities.Game
             
             do
             {
-                result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
+                result = await webSocket.ReceiveAsync(buffer, token);
                 if (result.Count > 0 && result.MessageType == WebSocketMessageType.Text)
                     memoryStream.Write(buffer.ToArray(), 0, result.Count);
                 else if (result.MessageType == WebSocketMessageType.Close)
@@ -272,10 +278,10 @@ namespace med_game.src.Entities.Game
             }
         }
 
-        private void PlayerAnswer(AnswerOption answer, long userId)
+        private void PlayerAnswer(AnswerOption? answer, long userId)
         {
             var question = Questions[CurrentQuestionIndex - 1];
-            if (answer.Equals(question.Answers[(int)question.CorrectAnswerIndex].ToAnswerOptionWithWebPath()))
+            if (answer?.Equals(question.Answers[(int)question.CorrectAnswerIndex].ToAnswerOptionWithWebPath()) == true)
             {
                 Players[userId].Statistics.pointGain = question.CountPointsPerAnswer;
                 if (Interlocked.CompareExchange(ref isAnsweredCorrectlyFirst, 1, 0) == 0)

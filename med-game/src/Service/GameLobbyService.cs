@@ -96,9 +96,10 @@ namespace med_game.src.Service
                         source.Cancel();
                 }
 
-                catch (JsonSerializationException)
+                catch (JsonSerializationException e)
                 {
-                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InvalidPayloadData, "Serialization error", CancellationToken.None);
+                    _logger.LogCritical(e.Message);
+                    await webSocket.CloseOutputAsync(WebSocketCloseStatus.InvalidPayloadData, $"Serialization error: {e.Message}", CancellationToken.None);
                 }
 
                 catch(WebSocketException ex)
@@ -121,7 +122,7 @@ namespace med_game.src.Service
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         }
 
-        private async Task<RoomSettingBody?> ReceiveRoomSettingJsonAsync(WebSocket webSocket)
+        private static async Task<RoomSettingBody?> ReceiveRoomSettingJsonAsync(WebSocket webSocket)
         {
             byte[] buffer = new byte[2048];
 
