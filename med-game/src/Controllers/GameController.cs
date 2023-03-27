@@ -5,24 +5,26 @@ using System.Net;
 using System.Net.WebSockets;
 using med_game.src.Utility;
 using med_game.src.Entities.Game;
+using System.Text;
 
 namespace med_game.src.Controllers
 {
-    [Route("main/{lobbyId}")]
     [ApiController]
     public class GameController : ControllerBase
     {
         private readonly JwtUtilities _jwtUtilities;
+        private readonly ILogger _logger;
 
 
         public GameController(ILoggerFactory loggerFactory)
         {
             _jwtUtilities = new JwtUtilities();
+            _logger = loggerFactory.CreateLogger("");
         }
 
 
-
         [Authorize]
+        [HttpGet("main/{lobbyId}")]
         public async Task ConnectToGame(string lobbyId)
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)

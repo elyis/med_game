@@ -79,21 +79,17 @@ namespace med_game.src.Service
                         return;
 
                     byte[] buffer = new byte[512];
-                    CancellationTokenSource source = new();
-                    CancellationToken token = source.Token;
 
                     
-                    Task<WebSocketReceiveResult> task = webSocket.ReceiveAsync(buffer, token);
+                    Task<WebSocketReceiveResult> task = webSocket.ReceiveAsync(buffer, CancellationToken.None);
                     while (webSocket.State == WebSocketState.Open && roomId == null)
                     {
                         if (task.IsCompletedSuccessfully && task.Result.MessageType == WebSocketMessageType.Close)
                             await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Distributor accepted close frame", CancellationToken.None);
 
                         roomId = await GameLobbyDistributorManager.GetLobbyId(userId, roomSettings);
-                        await Task.Delay(1000);
+                        await Task.Delay(3 * 1000);
                     }
-                    if (task.Status == TaskStatus.Running)
-                        source.Cancel();
                 }
 
                 catch (JsonSerializationException e)

@@ -93,76 +93,76 @@ namespace med_game.src.Entities.Game
             try
             {
                 while (isLobbyRunning == 0)
-                    await Task.Delay(1000);
+                    await Task.Delay(1 * 1000);
 
-                try
+
+                byte[] buffer = new byte[4096];
+                while (webSocket.State == WebSocketState.Open && isLobbyRunning == 1)
                 {
-                    while (webSocket.State == WebSocketState.Open && isLobbyRunning == 1)
+                    try
                     {
                         if (Players[userId].IsPlayerAnswer == 0)
                         {
-                            try
+                            var readAnswerTask = ReceiveJson(webSocket, buffer, CancellationToken.None);
+                            var timeoutForReadAnswerTask = Task.Delay(10 * 1000);
+                            var firstCompletedTask = await Task.WhenAny(readAnswerTask, timeoutForReadAnswerTask);
+                            
+
+                            if (readAnswerTask.IsFaulted)
+                                throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+
+                            if (firstCompletedTask == readAnswerTask)
                             {
-                                using var source = new CancellationTokenSource();
-                                var token = source.Token;
+                                var answer = JsonConvert.DeserializeObject<AnswerOption>(Encoding.UTF8.GetString(buffer));
+                                PlayerAnswer(answer, userId);
 
-                                var task = ReceiveJson<AnswerOption>(webSocket, token);
-                                if (await Task.WhenAny(task, Task.Delay(10 * 1000)) == task)
+                                if (countAnswering == Players.Count)
                                 {
-                                    PlayerAnswer(task.Result, userId);
-
-                                    if (countAnswering == Players.Count)
+                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
                                     {
-                                        if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                                        {
-                                            await SendStateGameAndQuestionToEveryone();
-                                            countAnswering = 0;
-                                            Interlocked.Exchange(ref isManaged, 0);
-                                        }
-                                        else
-                                            await Task.Delay(2000);
+                                        await SendStateGameAndQuestionToEveryone();
+                                        countAnswering = 0;
+                                        Interlocked.Exchange(ref isManaged, 0);
                                     }
                                     else
                                         await Task.Delay(2000);
                                 }
                                 else
-                                {
-                                    _logger.LogCritical($"{task.Status}");
-
-                                    _logger.LogCritical($"{Players[userId].Statistics.nickname}: operation cancelled");
-                                    Interlocked.Increment(ref countAnswering);
-                                    if (countAnswering == Players.Count)
-                                    {
-                                        if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                                        {
-                                            await SendStateGameAndQuestionToEveryone();
-                                            countAnswering = 0;
-                                            Interlocked.Exchange(ref isManaged, 0);
-                                        }
-                                        else
-                                            await Task.Delay(2000);
-                                    }
-                                    else
-                                        await Task.Delay(2000);
-                                }
+                                    await Task.Delay(2000);
                             }
-                            catch (WebSocketException e)
-                            {
-                                
-                                await ConsiderDefeat(userId);
-                                _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.Message}");
-                                _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {e.WebSocketErrorCode}");
-                            }
-                            
+                            else
+                                throw new OperationCanceledException("Timeout for answering is expired");
                         }
                         else
-                            await Task.Delay(2000);
+                            await Task.Delay(2 * 1000);
                     }
-
-                }
-                catch (Exception ex)
-                {
-                    await CloseAll(WebSocketCloseStatus.InternalServerError, ex.Message);
+                    catch(OperationCanceledException ex)
+                    {
+                        Interlocked.Increment(ref countAnswering);
+                        Players[userId].IsPlayerAnswer = 1;
+                        _logger.LogCritical("Operation cancelled");
+                        if (countAnswering == Players.Count)
+                        {
+                            if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                            {
+                                await SendStateGameAndQuestionToEveryone();
+                                countAnswering = 0;
+                                Interlocked.Exchange(ref isManaged, 0);
+                            }
+                            else
+                                await Task.Delay(2000);
+                        }
+                    }
+                    catch (WebSocketException ex)
+                    {
+                        await ConsiderDefeat(userId);
+                        _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {ex.Message}");
+                        _logger.LogCritical($"\"{PlayerInfo[userId].Nickname}\" get {ex.WebSocketErrorCode}");
+                    }
+                    catch(Exception ex)
+                    {
+                        await CloseAll(WebSocketCloseStatus.InternalServerError, ex.Message);
+                    }
                 }
             }
 
@@ -177,6 +177,7 @@ namespace med_game.src.Entities.Game
                 {
                     string winner = await GetWinner();
                     await SendStateGameToEveryone(winner);
+                    isLobbyRunning = 0;
                 }
                 else
                     await Task.Delay(500);
@@ -221,27 +222,34 @@ namespace med_game.src.Entities.Game
             }
         }
 
-        private async Task<T?> ReceiveJson<T>(WebSocket webSocket, CancellationToken token)
+        private async Task ReceiveJson(WebSocket webSocket, byte[] buffer, CancellationToken token)
         {
-            byte[] buffer = new byte[2048];
-
+            byte[] bytes = new byte[2048];
             WebSocketReceiveResult? result = null;
-            MemoryStream memoryStream = new();
+            MemoryStream stream = new MemoryStream();
             
             do
             {
-                result = await webSocket.ReceiveAsync(buffer, token);
+                result = await webSocket.ReceiveAsync(bytes, token);
                 if (result.Count > 0 && result.MessageType == WebSocketMessageType.Text)
-                    memoryStream.Write(buffer.ToArray(), 0, result.Count);
+                    stream.Write(bytes.ToArray(), 0, result.Count);
                 else if (result.MessageType == WebSocketMessageType.Close)
-                {
                     await CloseAll(WebSocketCloseStatus.NormalClosure, "Close frame accepter");
-                    return default;
-                }
 
             } while (!result.EndOfMessage && webSocket.State == WebSocketState.Open);
 
-            return JsonConvert.DeserializeObject<T?>(Encoding.UTF8.GetString(memoryStream.ToArray()));
+            buffer = stream.ToArray();
+        }
+
+        private static async Task TimeoutForReceive(WebSocket socket,int milliseconds)
+        {
+            int delay = 2 * 1000;
+            for(int i = 0; i < milliseconds; i += delay)
+            {
+                if (socket.State == WebSocketState.Aborted)
+                    throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+                await Task.Delay(delay);
+            }
         }
 
         private async Task SendAll<T>(T jsonMessage)
@@ -343,17 +351,15 @@ namespace med_game.src.Entities.Game
 
             if (RoomSettings.Type == TypeBattle.Rating)
             {
-                if (winners.ToHashSet().SetEquals(losers))
+                if(!losers.Any())
                 {
                     foreach (var player in winners)
-                        await _userRepository.UpdateRating(player.Key, countPointsForWin / 2);
-                    foreach(var player in losers)
                         await _userRepository.UpdateRating(player.Key, countPointsForWin / 2);
                 }
                 else
                 {
                     foreach (var player in winners)
-                        await _userRepository.UpdateRating(player.Key,  countPointsForWin);
+                        await _userRepository.UpdateRating(player.Key, countPointsForWin);
                     foreach (var player in losers)
                         await _userRepository.UpdateRating(player.Key, countPointsForLose);
                 }
