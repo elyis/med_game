@@ -2,6 +2,7 @@
 using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net.WebSockets;
@@ -23,6 +24,7 @@ Console.ReadLine();
 
 class GameLobbyDistributorTesting
 {
+    private readonly string serverUrl = "192.168.101.95:5121";
     private readonly int _countPlayers;
     private readonly List<AuthController> _authControllers = new List<AuthController>();
     private readonly List<RegistrationBody> _registrationBodies = new List<RegistrationBody>();
@@ -30,7 +32,7 @@ class GameLobbyDistributorTesting
     private readonly List<string> _accessTokens = new List<string>();
     private readonly List<(string email, string roomId)> _results = new List<(string email, string roomId)>();
     private readonly RoomSettingBody _roomSettingBody;
-    private readonly Uri uri = new Uri("wss://localhost:7296/main");
+    private readonly Uri uriToDistributorLobby;
     private readonly List<Task<(string, string)>> _tasks = new ();
 
     private readonly List<ClientWebSocket> _clients = new List<ClientWebSocket>();
@@ -44,6 +46,8 @@ class GameLobbyDistributorTesting
             ModuleName = "Остеология",
             Type = TypeBattle.Rating
         };
+
+        uriToDistributorLobby = new Uri($"ws://{serverUrl}/main");
 
         Init();
     }
@@ -91,7 +95,7 @@ class GameLobbyDistributorTesting
                 Password = registrationBody.Password
             };
 
-            var authController = new AuthController();
+            var authController = new AuthController(LoggerFactory.Create(builder => builder.AddConsole()));
 
             _authControllers.Add(authController);
             _logins.Add(login);
@@ -116,7 +120,7 @@ class GameLobbyDistributorTesting
         {
             ClientWebSocket client = new ClientWebSocket();
             client.Options.SetRequestHeader("Authorization", "Bearer " + _accessTokens[i]);
-            await client.ConnectAsync(uri, CancellationToken.None);
+            await client.ConnectAsync(uriToDistributorLobby, CancellationToken.None);
             _clients.Add(client);
         }
     }

@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.WebSockets;
 using med_game.src.Utility;
 using med_game.src.Entities.Game;
-using System.Text;
 
 namespace med_game.src.Controllers
 {

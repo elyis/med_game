@@ -131,27 +131,25 @@ namespace med_game.src.Entities.Game
                                     await Task.Delay(2000);
                             }
                             else
-                                throw new OperationCanceledException("Timeout for answering is expired");
+                            {
+                                Interlocked.Increment(ref countAnswering);
+                                Players[userId].IsPlayerAnswer = 1;
+                                _logger.LogInformation("Timeout for answering is expired");
+                                if (countAnswering == Players.Count)
+                                {
+                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                                    {
+                                        await SendStateGameAndQuestionToEveryone();
+                                        countAnswering = 0;
+                                        Interlocked.Exchange(ref isManaged, 0);
+                                    }
+                                    else
+                                        await Task.Delay(2000);
+                                }
+                            }
                         }
                         else
                             await Task.Delay(2 * 1000);
-                    }
-                    catch(OperationCanceledException ex)
-                    {
-                        Interlocked.Increment(ref countAnswering);
-                        Players[userId].IsPlayerAnswer = 1;
-                        _logger.LogCritical("Operation cancelled");
-                        if (countAnswering == Players.Count)
-                        {
-                            if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                            {
-                                await SendStateGameAndQuestionToEveryone();
-                                countAnswering = 0;
-                                Interlocked.Exchange(ref isManaged, 0);
-                            }
-                            else
-                                await Task.Delay(2000);
-                        }
                     }
                     catch (WebSocketException ex)
                     {
@@ -239,17 +237,6 @@ namespace med_game.src.Entities.Game
             } while (!result.EndOfMessage && webSocket.State == WebSocketState.Open);
 
             buffer = stream.ToArray();
-        }
-
-        private static async Task TimeoutForReceive(WebSocket socket,int milliseconds)
-        {
-            int delay = 2 * 1000;
-            for(int i = 0; i < milliseconds; i += delay)
-            {
-                if (socket.State == WebSocketState.Aborted)
-                    throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
-                await Task.Delay(delay);
-            }
         }
 
         private async Task SendAll<T>(T jsonMessage)

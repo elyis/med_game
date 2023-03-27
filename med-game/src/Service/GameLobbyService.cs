@@ -88,7 +88,7 @@ namespace med_game.src.Service
                             await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Distributor accepted close frame", CancellationToken.None);
 
                         roomId = await GameLobbyDistributorManager.GetLobbyId(userId, roomSettings);
-                        await Task.Delay(3 * 1000);
+                        await Task.Delay(2 * 1000);
                     }
                 }
 

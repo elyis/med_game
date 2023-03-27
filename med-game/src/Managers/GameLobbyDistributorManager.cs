@@ -2,7 +2,6 @@
 using System.Net.WebSockets;
 using System.Text;
 using med_game.src.Data;
-using med_game.src.Models;
 using med_game.src.Entities.Game;
 
 namespace med_game.src.Managers
@@ -18,7 +17,7 @@ namespace med_game.src.Managers
             => _connections.TryAdd(userId, connection);
 
         public static bool RemoveConnection(long userId)
-            => _connections.TryRemove(userId, out var connection);
+            => _connections.TryRemove(userId, out var _);
 
 
         public static async Task<string?> GetLobbyId(long userId, RoomSettings roomSettings)
@@ -27,36 +26,38 @@ namespace med_game.src.Managers
             {
                 if (Interlocked.CompareExchange(ref _connections[userId].IsEnemyFound, 1, 0) == 0)
                 {
-                    var enemy = _connections.FirstOrDefault(connection => connection.Key != userId &&
-                                                            connection.Value.IsEnemyFound == 0 &&
-                                                            connection.Value.RoomSettings.Equals(roomSettings));
-                    if(enemy.Equals(default(KeyValuePair<long, Connection>))) {
+                    var opponents = _connections.Where(
+                        connection => connection.Key != userId &&
+                        connection.Value.IsEnemyFound == 0 &&
+                        connection.Value.RoomSettings.Equals(roomSettings)
+                        )
+                        .Take(roomSettings.CountPlayers - 1)
+                        .ToArray();
+
+                    if (opponents.Length != roomSettings.CountPlayers - 1)
+                    {
                         Interlocked.Exchange(ref _connections[userId].IsEnemyFound, 0);
                         Interlocked.Exchange(ref isLocked, 0);
                         return null;
                     }
+                    long[] playerIds = opponents.Select(p => p.Key).Append(userId).ToArray();
 
-
-                    Interlocked.Exchange(ref _connections[enemy.Key].IsEnemyFound, 1);
-                    long[] userIds = new long[]
-                    {
-                        userId,
-                        enemy.Key
-                    };
+                    foreach (var opponent in opponents)
+                        Interlocked.Exchange(ref _connections[opponent.Key].IsEnemyFound, 1);
 
 
                     GamingLobby lobby = new GamingLobby(roomSettings,_logger);
                     if (!lobby.GenerateQuestion())
-                        await CloseAll(userIds,"Module does not contain questions", WebSocketCloseStatus.InvalidPayloadData);
+                        await CloseAll(playerIds,"Module does not contain questions", WebSocketCloseStatus.InvalidPayloadData);
 
-                    User? user = await _context.Users.FindAsync(userId)!;
-                    User? enemyUser = await _context.Users.FindAsync(enemy.Key);
+                    foreach(var playerId in playerIds)
+                    {
+                        var player = await _context.Users.FindAsync(playerId);
+                        lobby.AddPlayerInfo(playerId, player?.ToGameStatisticInfo()!);
+                    }
 
-                    lobby.AddPlayerInfo(userId, user?.ToGameStatisticInfo()!);
-                    lobby.AddPlayerInfo(enemy.Key, enemyUser?.ToGameStatisticInfo()!);
-
-                    await SendAll(lobby.Id, userIds);
-                    await CloseAll(userIds,"Lobby successfully created", WebSocketCloseStatus.NormalClosure);
+                    await SendAll(lobby.Id, playerIds);
+                    await CloseAll(playerIds,"Lobby successfully created", WebSocketCloseStatus.NormalClosure);
                     GlobalVariables.GamingLobbies.TryAdd(lobby.Id, lobby);
 
 
