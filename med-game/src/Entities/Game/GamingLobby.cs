@@ -16,19 +16,6 @@ namespace med_game.src.Entities.Game
         private readonly IUserRepository _userRepository;
         private readonly ILogger _logger;
 
-        public GamingLobby(RoomSettings roomSettings, ILogger logger, int countQuestions = 3)
-        {
-            RoomSettings = roomSettings;
-            CountQuestions = countQuestions;
-
-            Random rnd = new();
-            countPointsForWin = rnd.Next(8, 12);
-            countPointsForLose = -rnd.Next(3, 6);
-
-            _userRepository = new UserRepository(new AppDbContext());
-            _logger = logger;
-        }
-
         public string Id { get; } = Guid.NewGuid().ToString();
         public RoomSettings RoomSettings { get; }
 
@@ -52,6 +39,19 @@ namespace med_game.src.Entities.Game
         public readonly Dictionary<long, GameStatisticInfo> PlayerInfo = new();
         public ConcurrentDictionary<long, GameSession> Players { get; private set; } = new();
         private List<Question> Questions { get; set; }
+
+        public GamingLobby(RoomSettings roomSettings, ILogger logger, int countQuestions = 3)
+        {
+            RoomSettings = roomSettings;
+            CountQuestions = countQuestions;
+
+            Random rnd = new();
+            countPointsForWin = rnd.Next(8, 12);
+            countPointsForLose = -rnd.Next(3, 6);
+
+            _userRepository = new UserRepository(new AppDbContext());
+            _logger = logger;
+        }
 
         public bool AddPlayer(long userId, WebSocket webSocket)
         {
@@ -83,28 +83,19 @@ namespace med_game.src.Entities.Game
 
         public async Task ProcessLoop(WebSocket webSocket, long userId)
         {
-            if (Players.Count == PlayerInfo.Count)
-            {
-                if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                    await Start();
-            }
-
+            await ArePlayersJoined();
 
             try
             {
-                while (isLobbyRunning == 0)
-                    await Task.Delay(1 * 1000);
-
-
                 byte[] buffer = new byte[4096];
-                while (webSocket.State == WebSocketState.Open && isLobbyRunning == 1)
+                while (webSocket.State == WebSocketState.Open)
                 {
                     try
                     {
                         if (Players[userId].IsPlayerAnswer == 0)
                         {
                             var readAnswerTask = ReceiveJson(webSocket, buffer, CancellationToken.None);
-                            var timeoutForReadAnswerTask = Task.Delay(10 * 1000);
+                            var timeoutForReadAnswerTask = Task.Delay(Questions[CurrentQuestionIndex - 1].TimeSeconds * 1000);
                             var firstCompletedTask = await Task.WhenAny(readAnswerTask, timeoutForReadAnswerTask);
                             
 
@@ -115,37 +106,13 @@ namespace med_game.src.Entities.Game
                             {
                                 var answer = JsonConvert.DeserializeObject<AnswerOption>(Encoding.UTF8.GetString(buffer));
                                 PlayerAnswer(answer, userId);
-
-                                if (countAnswering == Players.Count)
-                                {
-                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                                    {
-                                        await SendStateGameAndQuestionToEveryone();
-                                        countAnswering = 0;
-                                        Interlocked.Exchange(ref isManaged, 0);
-                                    }
-                                    else
-                                        await Task.Delay(2000);
-                                }
-                                else
-                                    await Task.Delay(2000);
+                                await ArePlayersAnswered();
                             }
                             else
                             {
-                                Interlocked.Increment(ref countAnswering);
-                                Players[userId].IsPlayerAnswer = 1;
-                                _logger.LogInformation("Timeout for answering is expired");
-                                if (countAnswering == Players.Count)
-                                {
-                                    if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                                    {
-                                        await SendStateGameAndQuestionToEveryone();
-                                        countAnswering = 0;
-                                        Interlocked.Exchange(ref isManaged, 0);
-                                    }
-                                    else
-                                        await Task.Delay(2000);
-                                }
+                                _logger.LogInformation($"Timeout for answering is expired: buffer is {Encoding.UTF8.GetString(buffer)}");
+                                PlayerAnswer(null, userId);
+                                await ArePlayersAnswered();
                             }
                         }
                         else
@@ -171,7 +138,8 @@ namespace med_game.src.Entities.Game
             }
             finally
             {
-                if (Interlocked.CompareExchange(ref isResultSent, 1, 0) == 0)
+                RemovePlayer(userId);
+                if (Players.Count - 1 <= 1 && Interlocked.CompareExchange(ref isResultSent, 1, 0) == 0)
                 {
                     string winner = await GetWinner();
                     await SendStateGameToEveryone(winner);
@@ -180,10 +148,25 @@ namespace med_game.src.Entities.Game
                 else
                     await Task.Delay(500);
 
-                RemovePlayer(userId);
                 if (Players.Count <= 1)
                     GlobalVariables.GamingLobbies.Remove(Id, out _);
             }
+        }
+
+        private async Task ArePlayersAnswered()
+        {
+            if(countAnswering == Players.Count && Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+            {
+                await SendStateGameAndQuestionToEveryone();
+                return;
+            }
+            await Task.Delay(2000);
+        }
+
+        private async Task ArePlayersJoined()
+        {
+            if (Players.Count == PlayerInfo.Count && Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                await Start();
         }
 
         private async Task Start()
@@ -218,6 +201,8 @@ namespace med_game.src.Entities.Game
 
                 isAnsweredCorrectlyFirst = 0;
             }
+            countAnswering = 0;
+            isManaged = 0;
         }
 
         private async Task ReceiveJson(WebSocket webSocket, byte[] buffer, CancellationToken token)
