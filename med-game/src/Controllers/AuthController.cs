@@ -13,10 +13,10 @@ using med_game.src.Models;
 using med_game.src.Core.IManager;
 using System.Text;
 using Microsoft.AspNetCore.Http.Features;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace med_game.src.Controllers
 {
-    //[Route("auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -26,9 +26,8 @@ namespace med_game.src.Controllers
         private readonly IUserRepository _userRepository;
         private readonly ILogger _logger;
 
-        public AuthController(ILoggerFactory loggerFactory)
+        public AuthController(ILoggerFactory loggerFactory, AppDbContext context)
         {
-            AppDbContext context = new AppDbContext();
             _jwtManager = new JwtManager();
             _userRepository = new UserRepository(context);
 
@@ -40,42 +39,32 @@ namespace med_game.src.Controllers
         }
 
 
-        //[HttpPost("register")]
-        [HttpPost("sign_up")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [HttpPost("signup")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Successful registration", Type = typeof(TokenPair))]
+        [SwaggerResponse((int)HttpStatusCode.Conflict)]
+
 
         public async Task<IActionResult> SignUp(RegistrationBody registrationBody)
         {
             var result = await _authService.RegisterAsync(registrationBody);
-
-            int resultStatusCode = result == null ? 409 : 200;
-            _logger.LogInformation($"SignUp route: {result} with status code {resultStatusCode}");
-            
             return result == null ? Conflict("Email is exist") : Ok(result);
         }
 
 
-        //[HttpPost("login")]
-        [HttpPost("sign_in")]
-        [ProducesResponseType(typeof(TokenPair), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [HttpPost("signin")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(TokenPair))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound)]
 
         public async Task<IActionResult> SignIn(Login login)
         {
             var result = await _authService.LoginAsync(login);
-
-            int resultStatusCode = result == null ? 404 : 200;
-            _logger.LogInformation($"SignIn route: {result} with status code {resultStatusCode}");
-
             return result == null ? NotFound() : Ok(result);
         }
 
 
         [HttpPost("token")]
-        [ProducesResponseType(typeof(TokenPair), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(TokenPair))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound)]
 
         public async Task<IActionResult> RestoreToken()
         {
@@ -87,25 +76,21 @@ namespace med_game.src.Controllers
 
             using MemoryStream memoryStream = new MemoryStream();
             Request.Body.CopyTo(memoryStream);
+
             string refreshToken = Encoding.UTF8.GetString(memoryStream.ToArray());
             var result = await _authService.UpdateTokenAsync(refreshToken);
-
-            int resultStatusCode = result == null ? 404 : 200;
-            _logger.LogInformation($"Token route: {result} with status code {resultStatusCode}");
 
             return result == null ? NotFound() : Ok(result);
         }
 
         [HttpPost("reg_admin")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(TokenPair))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound)]
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> CreateAdmin(RegistrationBody registrationBody)
         {
             var result = await _authService.RegisterAsync(registrationBody, Roles.Admin);
-
-            int resultStatusCode = result == null ? 409 : 200;
-            _logger.LogInformation($"Registration admin route: {result} with status code {resultStatusCode}");
-
             return result == null ? Conflict("Email is exist") : Ok(result);
         }
 

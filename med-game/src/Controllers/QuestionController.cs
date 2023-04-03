@@ -5,11 +5,12 @@ using med_game.src.Entities.Request;
 using med_game.src.Models;
 using med_game.src.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("question")]
+    [Route("api/question")]
     [ApiController]
     public class QuestionController : ControllerBase
     {
@@ -19,10 +20,8 @@ namespace med_game.src.Controllers
 
         private readonly ILogger _logger;
 
-        public QuestionController(ILoggerFactory loggerFactory)
+        public QuestionController(ILoggerFactory loggerFactory, AppDbContext context)
         {
-            AppDbContext context = new AppDbContext();
-
             _moduleRepository = new ModuleRepository(context);
             _answerRepository = new AnswerRepository(context);
             _questionRepository = new QuestionRepository(context);
@@ -32,9 +31,12 @@ namespace med_game.src.Controllers
 
 
         [HttpPost]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.Conflict)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [SwaggerOperation("Create a new question")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Succesfully created")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Answers do not contain the correct answer / ...")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Module not found")]
+        [SwaggerResponse((int)HttpStatusCode.Conflict)]
+
         public async Task<IActionResult> CreateQuestion(RequestedQuestionBody questionBody)
         {
             Module? module = await _moduleRepository.GetAsync(questionBody.LecternName, questionBody.ModuleName);
@@ -62,8 +64,10 @@ namespace med_game.src.Controllers
 
 
         [HttpDelete]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Remove question")]
+        [SwaggerResponse((int)HttpStatusCode.NoContent, "Successfully removed")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Module not found")]
+
         public async Task<IActionResult> RemoveQuestion(RemovableQuestionBody questionBody)
         {
             Module? module = await _moduleRepository.GetAsync(questionBody.LecternName, questionBody.ModuleName);

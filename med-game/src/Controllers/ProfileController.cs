@@ -5,12 +5,13 @@ using med_game.src.Repository;
 using med_game.src.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 
 namespace med_game.src.Controllers
 {
-    [Route("")]
+    [Route("api")]
     [ApiController]
     public class ProfileController : ControllerBase
     {
@@ -18,9 +19,8 @@ namespace med_game.src.Controllers
         private readonly FileUploader _fileUploader;
         private readonly JwtUtilities _jwtUtilities;
 
-        public ProfileController(ILoggerFactory loggerFactory)
+        public ProfileController(ILoggerFactory loggerFactory, AppDbContext context)
         {
-            AppDbContext context = new AppDbContext();
             _userRepository = new UserRepository(context);
             _fileUploader = new FileUploader(loggerFactory);
             _jwtUtilities = new JwtUtilities();
@@ -30,9 +30,9 @@ namespace med_game.src.Controllers
 
         [HttpPost("profileIcon")]
         [Authorize]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.UnsupportedMediaType)]
+        [SwaggerOperation(Summary = "Upload profile icon to server")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Successfully created")]
+        [SwaggerResponse((int)HttpStatusCode.UnsupportedMediaType, "all formats are supported 'image/'")]
 
         public async Task<IActionResult> UploadProfileIcon()
         {
@@ -62,7 +62,8 @@ namespace med_game.src.Controllers
 
         [HttpGet("profile")]
         [Authorize]
-        [ProducesResponseType(typeof(ProfileBody), (int)HttpStatusCode.OK)]
+        [SwaggerOperation(Summary = "Get profile")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(ProfileBody))]
 
         public async Task<IActionResult> GetProfile()
         {
@@ -79,8 +80,9 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("profileIcon/{filename}")]
-        [ProducesResponseType(typeof(File), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Get profile image")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(File))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound)]
 
         public async Task<IActionResult> GetProfileImage(string filename)
         {

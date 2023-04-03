@@ -5,26 +5,27 @@ using med_game.src.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 
 namespace med_game.src.Controllers
 {
-    [Route("lectern")]
+    [Route("api/lectern")]
     [ApiController]
     public class LecternController : ControllerBase
     {
         private readonly ILecternRepository _lecternRepository;
-        public LecternController()
+        public LecternController(AppDbContext context)
         {
-            AppDbContext dbContext = new AppDbContext();
-            _lecternRepository = new LecternRepository(dbContext);
+            _lecternRepository = new LecternRepository(context);
         }
 
 
         [HttpPost]
-        [ProducesResponseType((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.Conflict)]
+        [SwaggerOperation(Summary = "Create a new lectern")]
+        [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.Conflict)]
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> CreateLectern(List<LecternBody> lecternBodies)
@@ -35,13 +36,14 @@ namespace med_game.src.Controllers
 
 
         [HttpDelete("rm/{name}")]
-        [ProducesResponseType((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [SwaggerOperation(Summary = "Remove lectern")]
+        [SwaggerResponse((int)HttpStatusCode.NoContent, "Deleted successfully")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Not found by name")]
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> RemoveLectern(string name)
         {
-            if(name.IsNullOrEmpty()) 
+            if (name.IsNullOrEmpty())
                 return BadRequest();
 
             var result = await _lecternRepository.RemoveAsync(name);
@@ -50,21 +52,20 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("{name}")]
-        [ProducesResponseType(typeof(LecternBody), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Get lectern")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(LecternBody))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Not found by name")]
 
         public async Task<ActionResult<LecternBody>> GetByName(string name)
         {
-            if(name.IsNullOrEmpty())
-                return BadRequest();
-
             var result = await _lecternRepository.GetAsync(name);
             return result == null ? NotFound() : Ok(result.ToLecternBody());
         }
 
 
         [HttpGet("all")]
-        [ProducesResponseType(typeof(List<LecternBody>), (int) HttpStatusCode.OK)]
+        [SwaggerOperation(Summary = "Get all lecterns")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<LecternBody>))]
         public ActionResult<List<LecternBody>> GetAll()
         {
             var result = _lecternRepository.GetAll();
@@ -74,12 +75,10 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("all/{pattern}")]
-        [ProducesResponseType(typeof(List<LecternBody>), (int)HttpStatusCode.OK)]
+        [SwaggerOperation(Summary = "Get all lecterns by pattern")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<LecternBody>))]
         public ActionResult<List<LecternBody>> GetAll(string pattern)
         {
-            if(pattern.IsNullOrEmpty())
-                return BadRequest();
-
             var result = _lecternRepository.GetAll(pattern);
             return Ok(result.Select(l => l.ToLecternBody())
                 .ToList());

@@ -1,16 +1,17 @@
 ﻿using med_game.src.Core.IRepository;
 using med_game.src.Data;
-using med_game.src.Entities;
 using med_game.src.Entities.Response;
 using med_game.src.Repository;
 using med_game.src.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("")]
+    [Route("api")]
     [ApiController]
     public class PlayerController : ControllerBase
     {
@@ -20,7 +21,7 @@ namespace med_game.src.Controllers
 
         public PlayerController()
         {
-            AppDbContext context = new AppDbContext();
+            AppDbContext context = new AppDbContext(new DbContextOptions<AppDbContext>());
             _userRepository = new UserRepository(context);
             _jwtUtilities = new JwtUtilities();
         }
@@ -29,7 +30,8 @@ namespace med_game.src.Controllers
 
         [HttpGet("players/{pattern}")]
         [Authorize]
-        [ProducesResponseType(typeof(List<UserInfo>), (int)HttpStatusCode.OK)]
+        [SwaggerOperation(Summary = "Get users by pattern of nickname")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<UserInfo>))]
 
         public async Task<IActionResult> GetPlayersByPattern(string pattern)
         {
@@ -46,6 +48,8 @@ namespace med_game.src.Controllers
 
         [HttpGet("rating")]
         [Authorize]
+        [SwaggerOperation(Summary = "Get user rating")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(Rating))]
         [ProducesResponseType(typeof(Rating), (int)HttpStatusCode.OK)]
 
         public IActionResult GetPlayerRating()

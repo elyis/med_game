@@ -7,11 +7,12 @@ using med_game.src.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("achievement")]
+    [Route("api/achievement")]
     [ApiController]
     public class AchievementController : ControllerBase
     {
@@ -21,11 +22,10 @@ namespace med_game.src.Controllers
 
 
 
-        public AchievementController()
+        public AchievementController(AppDbContext context)
         {
-            AppDbContext dbContext = new AppDbContext();
-            _achievementRepository = new AchievementRepository(dbContext);
-            _userRepository = new UserRepository(dbContext);
+            _achievementRepository = new AchievementRepository(context);
+            _userRepository = new UserRepository(context);
 
             _achievementService = new AchievementService(
                 _achievementRepository,
@@ -35,38 +35,37 @@ namespace med_game.src.Controllers
 
 
         [HttpPost]
-        [ProducesResponseType((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.Conflict)]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Achievement created for all users")]
+        [SwaggerResponse((int)HttpStatusCode.Conflict, "There is an achievement with this name")]
+        [SwaggerOperation(Summary = "Create a new achievement")]
+
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> CreateAchievement(AchievementBody achievementBody)
         {
-            if (achievementBody == null) 
-                return BadRequest();
-
             var result = await _achievementService.AddAsync(achievementBody);
             return result == null ? Conflict() : Ok();
         }
 
 
+
         [HttpGet("all/{pattern}")]
-        [ProducesResponseType(typeof(List<AchievementBody>), (int)HttpStatusCode.OK)]
+        [SwaggerOperation(Summary = "Get all achievements by pattern")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<AchievementBody>))]
 
         public async Task<ActionResult<List<AchievementBody>>> GetByName(string pattern)
         {
-            if(pattern.IsNullOrEmpty())
-                return BadRequest();
-
             var result = await _achievementRepository.GetAllAsync(pattern);
-            return result == null ? 
-                NotFound() : 
+            return result == null ?
+                NotFound() :
                 Ok(result.Select(a => a.ToAchievementBody())
                     .ToList());
         }
 
 
         [HttpGet("all")]
-        [ProducesResponseType(typeof(List<AchievementBody>), (int)HttpStatusCode.OK)]
+        [SwaggerOperation(Summary = "Get all achievements")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<AchievementBody>))]
 
         public async Task<ActionResult<List<AchievementBody>>> GetAllAchievements()
         {
@@ -76,13 +75,14 @@ namespace med_game.src.Controllers
 
 
         [HttpDelete("rm/{name}")]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [SwaggerOperation(Summary = "Remove achievement by name")]
+        [SwaggerResponse((int)HttpStatusCode.NoContent, "Deleted successfully")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Achievement with this name does not exist")]
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> RemoveAchievementByName(string name)
         {
-            if(name.IsNullOrEmpty())
+            if (name.IsNullOrEmpty())
                 return BadRequest();
 
             var result = await _achievementRepository.RemoveAsync(name);

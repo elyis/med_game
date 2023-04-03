@@ -3,6 +3,7 @@ using System.Net.WebSockets;
 using System.Text;
 using med_game.src.Data;
 using med_game.src.Entities.Game;
+using Microsoft.EntityFrameworkCore;
 
 namespace med_game.src.Managers
 {
@@ -10,7 +11,7 @@ namespace med_game.src.Managers
     {
         private static readonly ConcurrentDictionary<long, Connection> _connections = new();
         private static int isLocked = 0;
-        private static readonly AppDbContext _context = new AppDbContext();
+        private static readonly AppDbContext _context = new AppDbContext(new DbContextOptions<AppDbContext>());
         private static readonly ILogger _logger = LoggerFactory.Create(config => config.AddConsole()).CreateLogger("distributor");
 
         public static bool AddConnection(long userId, Connection connection)

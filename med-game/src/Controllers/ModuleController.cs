@@ -7,12 +7,13 @@ using med_game.src.Repository;
 using med_game.src.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 
 namespace med_game.src.Controllers
 {
-    [Route("module")]
+    [Route("api/module")]
     [ApiController]
     public class ModuleController : ControllerBase
     {
@@ -20,26 +21,27 @@ namespace med_game.src.Controllers
         private readonly ILecternRepository _lecternRepository;
         private readonly IModuleService _moduleService;
 
-        public ModuleController()
+        public ModuleController(AppDbContext context)
         {
-            AppDbContext dbContext = new AppDbContext();
-            _moduleRepository = new ModuleRepository(dbContext);
-            _lecternRepository = new LecternRepository(dbContext);
+            _moduleRepository = new ModuleRepository(context);
+            _lecternRepository = new LecternRepository(context);
 
             _moduleService = new ModuleService(_moduleRepository, _lecternRepository);
         }
 
 
         [HttpPost]
-        [ProducesResponseType((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.Conflict)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Create lectern module")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Succesfully created")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Lectern is not exist")]
+        [SwaggerResponse((int)HttpStatusCode.Conflict)]
+
         [Authorize(Roles = "Admin")]
 
         public async Task<ActionResult> CreateModule(RequestedModuleBody moduleBody)
         {
             var lectern = await _lecternRepository.GetAsync(moduleBody.LecternName);
-            if(lectern == null) 
+            if (lectern == null)
                 return NotFound();
 
             var result = await _moduleService.CreateModule(moduleBody);
@@ -48,29 +50,31 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("{lecternName}")]
-        [ProducesResponseType(typeof(List<ModuleBody>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Get modules by lectern name")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<ModuleBody>))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Lectern is not exist")]
 
         public async Task<ActionResult> GetModulesByLecternName(string lecternName)
         {
             var result = await _moduleService.GetModules(lecternName);
-            return result == null ? 
-                NotFound() : 
+            return result == null ?
+                NotFound() :
                 Ok(result
-                    .Select(m => 
+                    .Select(m =>
                         m.ToModuleBody()).ToList());
         }
 
 
         [HttpDelete]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [SwaggerOperation(Summary = "Remove module")]
+        [SwaggerResponse((int)HttpStatusCode.NoContent, "Successfully removed")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Module is not exist")]
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> RemoveModule(RemovableModuleBody moduleBody)
         {
             var result = await _moduleRepository.RemoveAsync(moduleBody.LecternName, moduleBody.ModuleName);
-            return result == false ? NotFound() : NoContent();  
+            return result == false ? NotFound() : NoContent();
         }
     }
 }

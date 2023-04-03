@@ -1,11 +1,12 @@
 ﻿using med_game.src.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("")]
+    [Route("api")]
     [ApiController]
     public class ImageUploaderController : ControllerBase
     {
@@ -19,9 +20,9 @@ namespace med_game.src.Controllers
 
         [HttpPost("answerIcon")]
         [Authorize]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.UnsupportedMediaType)]
+        [SwaggerOperation(Summary = "Upload answer icon to server")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(string))]
+        [SwaggerResponse((int)HttpStatusCode.UnsupportedMediaType, "All formats are supported 'image/'")]
 
         public async Task<IActionResult> UploadAnswerIcon()
         {
@@ -39,9 +40,9 @@ namespace med_game.src.Controllers
 
         [HttpPost("questionIcon")]
         [Authorize]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.UnsupportedMediaType)]
+        [SwaggerOperation(Summary = "Upload question icon to server")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(string))]
+        [SwaggerResponse((int)HttpStatusCode.UnsupportedMediaType, "All formats are supported 'image/'")]
 
         public async Task<IActionResult> UploadQuestionIcon()
         {
@@ -59,9 +60,9 @@ namespace med_game.src.Controllers
 
         [HttpPost("achievementIcon")]
         [Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.UnsupportedMediaType)]
+        [SwaggerOperation(Summary = "Upload achievement icon to server")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(string))]
+        [SwaggerResponse((int)HttpStatusCode.UnsupportedMediaType, "All formats are supported 'image/'")]
 
         public async Task<IActionResult> UploadAchievementIcon()
         {
@@ -78,8 +79,9 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("answerIcon/{filename}")]
-        [ProducesResponseType(typeof(File), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Get answer icon")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(File))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Image not exist")]
 
         public async Task<IActionResult> GetAnswerIcon(string filename)
         {
@@ -93,8 +95,9 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("questionIcon/{filename}")]
-        [ProducesResponseType(typeof(File), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Get question icon")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(File))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Image not exist")]
 
         public async Task<IActionResult> GetQuestionIcon(string filename)
         {
@@ -108,8 +111,9 @@ namespace med_game.src.Controllers
 
 
         [HttpGet("achievementIcon/{filename}")]
-        [ProducesResponseType(typeof(File), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Get achievement icon")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(File))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Image not exist")]
 
         public async Task<IActionResult> GetAchievementIcon(string filename)
         {

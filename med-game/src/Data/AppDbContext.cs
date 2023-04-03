@@ -9,6 +9,8 @@ namespace med_game.src.Data
 {
     public class AppDbContext : DbContext
     {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Achievement> Achievements { get; set; }
         public DbSet<Answer> Answers { get; set; }
@@ -26,7 +28,8 @@ namespace med_game.src.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Friends>(f =>
             {
                 f.HasKey(f => new { f.UserId, f.FriendId });
@@ -44,7 +47,7 @@ namespace med_game.src.Data
 
             modelBuilder.Entity<FriendRequest>(f =>
             {
-                f.HasKey(f => new {f.UserId, f.SubscriberId });
+                f.HasKey(f => new { f.UserId, f.SubscriberId });
 
                 f.HasOne(f => f.Subscriber)
                     .WithMany(u => u.FriendRequestFromMe)

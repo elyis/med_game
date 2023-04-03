@@ -5,9 +5,12 @@ using System.Net;
 using System.Net.WebSockets;
 using med_game.src.Utility;
 using med_game.src.Entities.Game;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace med_game.src.Controllers
 {
+
+
     [ApiController]
     public class GameController : ControllerBase
     {
@@ -24,6 +27,8 @@ namespace med_game.src.Controllers
 
         [Authorize]
         [HttpGet("main/{lobbyId}")]
+        [SwaggerOperation(Summary = "Game lobby")]
+
         public async Task ConnectToGame(string lobbyId)
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)

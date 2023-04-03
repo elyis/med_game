@@ -5,30 +5,30 @@ using med_game.src.Repository;
 using med_game.src.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace med_game.src.Controllers
 {
     [ApiController]
+    [Route("api")]
     public class FriendController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
         private readonly JwtUtilities _jwtUtilities;
 
-        public FriendController()
+        public FriendController(AppDbContext context)
         {
-            AppDbContext context = new AppDbContext();
             _userRepository = new UserRepository(context);
-
             _jwtUtilities = new JwtUtilities();
         }
 
 
-        //[HttpPost("friend/{email")]
         [HttpPatch("friend/{email}")]
         [Authorize]
-        [ProducesResponseType((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Add friend from subscribers")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "The subscriber became a friend")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "no subscriber")]
 
         public async Task<IActionResult> ChangeSubscriberToFriend(string email)
         {
@@ -46,8 +46,9 @@ namespace med_game.src.Controllers
 
         [HttpDelete("friend/{email}")]
         [Authorize]
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [SwaggerOperation(Summary = "Remove friend")]
+        [SwaggerResponse((int)HttpStatusCode.NoContent, "Deleted successfully")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Friend is not exist")]
 
         public async Task<IActionResult> RemoveFriend(string email)
         {
@@ -61,11 +62,12 @@ namespace med_game.src.Controllers
             return result == false ? NotFound() : NoContent();
         }
 
-            
+
 
         [HttpGet("friends")]
         [Authorize]
-        [ProducesResponseType(typeof(List<FriendInfo>), (int) HttpStatusCode.OK)]
+        [SwaggerOperation(Summary = "Get a list of friends, followings and subscribers")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<FriendInfo>))]
 
         public async Task GetFriendsAndSubscribers()
         {

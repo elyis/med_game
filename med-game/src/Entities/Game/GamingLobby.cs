@@ -4,6 +4,7 @@ using med_game.src.Entities.Request;
 using med_game.src.Entities.Response;
 using med_game.src.Models;
 using med_game.src.Repository;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
@@ -49,7 +50,7 @@ namespace med_game.src.Entities.Game
             countPointsForWin = rnd.Next(8, 12);
             countPointsForLose = -rnd.Next(3, 6);
 
-            _userRepository = new UserRepository(new AppDbContext());
+            _userRepository = new UserRepository(new AppDbContext(new DbContextOptions<AppDbContext>()));
             _logger = logger;
         }
 
@@ -72,7 +73,7 @@ namespace med_game.src.Entities.Game
 
         public bool GenerateQuestion()
         {
-            IQuestionRepository questionRepository = new QuestionRepository(new AppDbContext());
+            IQuestionRepository questionRepository = new QuestionRepository(new AppDbContext(new DbContextOptions<AppDbContext>()));
             var questions = questionRepository.GenerateRandomQuestions(RoomSettings.LecternId, RoomSettings.ModuleId, CountQuestions);
             if (questions == null)
                 return false;

@@ -5,6 +5,7 @@ using med_game.src.Service;
 using med_game.src.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace med_game.src.Controllers
 {
@@ -12,9 +13,8 @@ namespace med_game.src.Controllers
     {
         private readonly IGameLobbyService _gameLobbyService;
 
-        public GameLobbyDistributorController(ILoggerFactory loggerFactory)
+        public GameLobbyDistributorController(ILoggerFactory loggerFactory, AppDbContext context)
         {
-            AppDbContext context = new AppDbContext();
             var moduleRepository = new ModuleRepository(context);
             var lecternRepository = new LecternRepository(context);
             var jwtUtilities = new JwtUtilities();
@@ -28,12 +28,11 @@ namespace med_game.src.Controllers
 
 
 
-        [Route("main")]
-        [HttpGet]
+        [HttpGet("main")]
         [Authorize]
+        [SwaggerOperation(Summary = "Game search")]
+
         public async Task Get()
-        {
-            await _gameLobbyService.InvokeAsync(HttpContext);
-        }
+            => await _gameLobbyService.InvokeAsync(HttpContext);
     }
 }
