@@ -1,7 +1,9 @@
 ﻿using med_game.src.Controllers;
+using med_game.src.Data;
 using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using Xunit;
@@ -32,7 +34,7 @@ namespace test.Controller
                 (int) HttpStatusCode.Conflict,
             };
 
-            AuthController authController = new AuthController(_loggerFactory);
+            AuthController authController = new AuthController(_loggerFactory, new AppDbContext(new DbContextOptions<AppDbContext>()));
 
             var result = await authController.SignUp(registrationBody) as ObjectResult;
             Assert.NotNull(result);
@@ -51,7 +53,7 @@ namespace test.Controller
                 Password = "success"
             };
 
-            AuthController authController = new AuthController(_loggerFactory);
+            AuthController authController = new AuthController(_loggerFactory, new AppDbContext(new DbContextOptions<AppDbContext>()));
             var result = await authController.SignIn(login) as ObjectResult;
             Assert.NotNull(result);
             
@@ -70,7 +72,7 @@ namespace test.Controller
                 Password = "failed"
             };
 
-            AuthController authController = new AuthController(_loggerFactory);
+            AuthController authController = new AuthController(_loggerFactory, new AppDbContext(new DbContextOptions<AppDbContext>()));
 
 
             var result = await authController.SignIn(login) as ObjectResult;
@@ -83,7 +85,7 @@ namespace test.Controller
             var tokenPair = await SuccessfulLogin();
             Assert.NotNull(tokenPair);
 
-            var authController = new AuthController(_loggerFactory);
+            var authController = new AuthController(_loggerFactory, new AppDbContext(new DbContextOptions<AppDbContext>()));
             var result = await authController.RestoreToken() as ObjectResult;
             Assert.NotNull(result);
 

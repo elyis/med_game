@@ -10,7 +10,7 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api/question")]
+    [Route("question")]
     [ApiController]
     public class QuestionController : ControllerBase
     {

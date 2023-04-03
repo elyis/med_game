@@ -2,7 +2,7 @@
 {
     public class Constants
     {
-        private const string server_url = "http://192.168.101.95:5121/";
+        private const string server_url = "http://192.168.0.107:5121/";
 
         //local photo storage 
         public const string pathToIcons = @"src\Resources\Storages\";

@@ -1,5 +1,4 @@
 ﻿using med_game.Models;
-using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using med_game.src.Entities.Response;
 using med_game.src.models;
@@ -25,7 +24,6 @@ namespace med_game.src.Core.IRepository
         Task<bool> UpdateImageAsync(long id, string filename);
         Task<bool> UpdateImageAsync(string email, string filename);
 
-        Task<User?> LoginAsync(Login login);
         Task AddAchievementToEveryone(Achievement achievement);
 
         Task<FriendRequest?> GetFriendRequest(long id, string friendEmail);

@@ -11,7 +11,7 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api")]
+    [Route("")]
     [ApiController]
     public class PlayerController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace med_game.src.Controllers
         private readonly JwtUtilities _jwtUtilities;
 
 
-        public PlayerController()
+         public PlayerController()
         {
             AppDbContext context = new AppDbContext(new DbContextOptions<AppDbContext>());
             _userRepository = new UserRepository(context);
@@ -28,13 +28,17 @@ namespace med_game.src.Controllers
 
 
 
-        [HttpGet("players/{pattern}")]
+        [HttpPost("players")]
         [Authorize]
         [SwaggerOperation(Summary = "Get users by pattern of nickname")]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<UserInfo>))]
 
-        public async Task<IActionResult> GetPlayersByPattern(string pattern)
+        public async Task<IActionResult> GetPlayersByPattern()
         {
+            string pattern;
+            using (var reader = new StreamReader(Request.Body))
+                pattern = await reader.ReadToEndAsync();
+
             string token = Request.Headers.Authorization!;
             string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
 

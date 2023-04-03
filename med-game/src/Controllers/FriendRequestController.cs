@@ -9,7 +9,7 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api/friendReq")]
+    [Route("friendReq")]
     [ApiController]
     public class FriendRequestController : ControllerBase
     {

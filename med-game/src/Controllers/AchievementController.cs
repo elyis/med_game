@@ -12,7 +12,7 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api/achievement")]
+    [Route("achievement")]
     [ApiController]
     public class AchievementController : ControllerBase
     {

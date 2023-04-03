@@ -13,7 +13,7 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api/module")]
+    [Route("module")]
     [ApiController]
     public class ModuleController : ControllerBase
     {
@@ -60,8 +60,7 @@ namespace med_game.src.Controllers
             return result == null ?
                 NotFound() :
                 Ok(result
-                    .Select(m =>
-                        m.ToModuleBody()).ToList());
+                    .Select(m => m.Name).ToList());
         }
 
 

@@ -11,7 +11,6 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api")]
     [ApiController]
     public class ProfileController : ControllerBase
     {

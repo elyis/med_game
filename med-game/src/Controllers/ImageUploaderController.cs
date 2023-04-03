@@ -6,7 +6,7 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api")]
+    [Route("")]
     [ApiController]
     public class ImageUploaderController : ControllerBase
     {

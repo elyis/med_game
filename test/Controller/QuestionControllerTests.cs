@@ -5,6 +5,8 @@ using Xunit;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using med_game.src.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace test.Controller
 {
@@ -13,8 +15,8 @@ namespace test.Controller
         [Fact]
         public async Task SuccesfullyCreateQuestion()
         {
-            QuestionController controller = new QuestionController(LoggerFactory.Create(config => config.AddConsole()));
-            string lecternName = "Анатомия";
+            QuestionController controller = new QuestionController(LoggerFactory.Create(config => config.AddConsole()), new AppDbContext(new DbContextOptions<AppDbContext>()));
+            string lecternName = "Anatomy";
             List<StatusCodeResult> responces = new ();
 
             int[] validHttpCodes = new int[]
@@ -85,8 +87,8 @@ namespace test.Controller
                     ModuleName = "Остеология",
                     TypeQuestion = TypeQuestion.Image,
                     TimeSeconds = 78,
-                    Text = "Что изображено под 6-ым пунктом?",
-                    Description = null,
+                    Text = null,
+                    Description = "Что изображено под 6-ым пунктом?",
                     Image = "skeleton.jpg",
                     RightAnswer = new AnswerOption(TypeAnswer.Text, "Плечевая кость", null),
                     ListOfAnswers = new List<AnswerOption>
@@ -195,8 +197,8 @@ namespace test.Controller
                     ModuleName = "Миология",
                     TypeQuestion = TypeQuestion.Image,
                     TimeSeconds = 100,
-                    Text = "Что указано под 4?",
-                    Description = null,
+                    Text = null,
+                    Description = "Что указано под 4?",
                     Image = "myology.jpeg",
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "pectoralis major", null),
@@ -408,8 +410,8 @@ namespace test.Controller
                     ModuleName = "Центральная нервная система",
                     TypeQuestion = TypeQuestion.Image,
                     TimeSeconds = 56,
-                    Text = "Какая представлена система?",
-                    Description = null,
+                    Text = null,
+                    Description = "Какая представлена система?",
                     Image = "img_1.png",
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "Центральная нервная система", null),
@@ -428,8 +430,8 @@ namespace test.Controller
                     ModuleName = "Периферическая нервная система",
                     TypeQuestion = TypeQuestion.Image,
                     TimeSeconds = 56,
-                    Text = "Какая представлена система?",
-                    Description = null,
+                    Text = null,
+                    Description = "Какая представлена система?",
                     Image = "img_2.png",
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "Периферическая нервная система", null),

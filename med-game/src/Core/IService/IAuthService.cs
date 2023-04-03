@@ -7,7 +7,7 @@ namespace med_game.src.Core.IService
     interface IAuthService
     {
         Task<TokenPair?> RegisterAsync(RegistrationBody user, Roles role = Roles.User);
-        Task<TokenPair?> LoginAsync(Login login);
+        Task<TokenPair?> LoginAsync(User user);
         Task<TokenPair?> UpdateTokenAsync(string refreshToken);
     }
 }

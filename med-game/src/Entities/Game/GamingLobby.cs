@@ -86,16 +86,18 @@ namespace med_game.src.Entities.Game
         {
             await ArePlayersJoined();
 
+            while(isLobbyRunning == 0)
+                await Task.Delay(1000);
+
             try
             {
-                byte[] buffer = new byte[4096];
                 while (webSocket.State == WebSocketState.Open)
                 {
                     try
                     {
                         if (Players[userId].IsPlayerAnswer == 0)
                         {
-                            var readAnswerTask = ReceiveJson(webSocket, buffer, CancellationToken.None);
+                            var readAnswerTask = ReceiveJson<AnswerOption>(webSocket, CancellationToken.None);
                             var timeoutForReadAnswerTask = Task.Delay(Questions[CurrentQuestionIndex - 1].TimeSeconds * 1000);
                             var firstCompletedTask = await Task.WhenAny(readAnswerTask, timeoutForReadAnswerTask);
                             
@@ -105,13 +107,12 @@ namespace med_game.src.Entities.Game
 
                             if (firstCompletedTask == readAnswerTask)
                             {
-                                var answer = JsonConvert.DeserializeObject<AnswerOption>(Encoding.UTF8.GetString(buffer));
-                                PlayerAnswer(answer, userId);
+                                PlayerAnswer(await readAnswerTask, userId);
                                 await ArePlayersAnswered();
                             }
                             else
                             {
-                                _logger.LogInformation($"Timeout for answering is expired: buffer is {Encoding.UTF8.GetString(buffer)}");
+                                _logger.LogInformation($"Timeout for answering is expired");
                                 PlayerAnswer(null, userId);
                                 await ArePlayersAnswered();
                             }
@@ -166,13 +167,16 @@ namespace med_game.src.Entities.Game
 
         private async Task ArePlayersJoined()
         {
-            if (Players.Count == PlayerInfo.Count && Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
-                await Start();
+            if (Players.Count == PlayerInfo.Count)
+            {
+                if (Interlocked.CompareExchange(ref isManaged, 1, 0) == 0)
+                    await Start();
+            }
         }
 
         private async Task Start()
         {
-            MaxPointsByQuestions = Questions.Select(e => e.CountPointsPerAnswer).Sum();
+            MaxPointsByQuestions = Questions.Select(e => e.CountPointsPerAnswer).Sum() + CountQuestions;
             foreach (var player in Players)
                 player.Value.Statistics.maxPointsGame = MaxPointsByQuestions;
 
@@ -206,7 +210,7 @@ namespace med_game.src.Entities.Game
             isManaged = 0;
         }
 
-        private async Task ReceiveJson(WebSocket webSocket, byte[] buffer, CancellationToken token)
+        private async Task<T> ReceiveJson<T>(WebSocket webSocket, CancellationToken token)
         {
             byte[] bytes = new byte[2048];
             WebSocketReceiveResult? result = null;
@@ -222,7 +226,7 @@ namespace med_game.src.Entities.Game
 
             } while (!result.EndOfMessage && webSocket.State == WebSocketState.Open);
 
-            buffer = stream.ToArray();
+            return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(stream.ToArray()));
         }
 
         private async Task SendAll<T>(T jsonMessage)

@@ -26,7 +26,7 @@ namespace med_game.src.Controllers
 
 
         [Authorize]
-        [HttpGet("main/{lobbyId}")]
+        [HttpGet("room/{lobbyId}")]
         [SwaggerOperation(Summary = "Game lobby")]
 
         public async Task ConnectToGame(string lobbyId)

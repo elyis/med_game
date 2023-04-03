@@ -40,7 +40,7 @@ namespace med_game.src.Managers
             var accessToken = new JwtSecurityToken
                 (
                     claims: claims,
-                    expires: DateTime.UtcNow.AddHours(2),
+                    expires: DateTime.UtcNow.AddYears(1),
                     signingCredentials: _signingCredentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(accessToken);

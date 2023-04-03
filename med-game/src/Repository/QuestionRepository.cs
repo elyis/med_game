@@ -80,16 +80,19 @@ namespace med_game.src.Repository
             List<Question> result = new List<Question>();
             if (moduleId != null)
             {
+                var questionsByModule = _context.Questions
+                    .Include(q => q.Answers)
+                    .Where(q => q.Module.Id == moduleId)
+                    .Take(countQuestions)
+                    .ToList();
                 while (result.Count < countQuestions)
                 {
-                    var questions = _context.Questions
-                        .Include(q => q.Answers)
-                        .AsEnumerable()
-                        .Where(q => q.Module.Id == moduleId)
+                    var questions = questionsByModule
                         .OrderBy(q => Guid.NewGuid())
-                        .Take(countQuestions - result.Count);
+                        .Take(countQuestions - result.Count)
+                        .ToList();
 
-                    if (questions.Count() == 0)
+                    if (!questions.Any())
                         return null;
                     result.AddRange(questions);
                 }

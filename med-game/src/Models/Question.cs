@@ -42,7 +42,7 @@ namespace med_game.src.Models
                timeSeconds = TimeSeconds,
 
                type = (TypeQuestion)Enum.Parse(typeof(TypeQuestion), Type),
-               rightAnswer = Answers[(int)CorrectAnswerIndex].ToAnswerOption(),
+               rightAnswer = Answers[(int)CorrectAnswerIndex].ToAnswerOptionWithWebPath(),
                answers = Answers.Select(a => a.ToAnswerOptionWithWebPath()).ToList(),
            };
     }

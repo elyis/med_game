@@ -15,6 +15,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http.Features;
 using Swashbuckle.AspNetCore.Annotations;
 
+
 namespace med_game.src.Controllers
 {
     [ApiController]
@@ -57,7 +58,14 @@ namespace med_game.src.Controllers
 
         public async Task<IActionResult> SignIn(Login login)
         {
-            var result = await _authService.LoginAsync(login);
+            var user = await _userRepository.GetAsync(login.Mail);
+            if (user == null)
+                return NotFound();
+
+            if (user.Password != login.Password)
+                return BadRequest();
+
+            var result = await _authService.LoginAsync(user);
             return result == null ? NotFound() : Ok(result);
         }
 

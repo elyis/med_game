@@ -1,6 +1,8 @@
 ﻿using med_game.src.Controllers;
+using med_game.src.Data;
 using med_game.src.Entities.Request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Xunit;
 
@@ -11,7 +13,7 @@ namespace test.Controller
         [Fact]
         public async Task SuccesfulCreateModule()
         {
-            ModuleController controller = new ModuleController();
+            ModuleController controller = new ModuleController(new AppDbContext(new DbContextOptions<AppDbContext>()));
             string lecternName = "Анатомия";
 
             RequestedModuleBody[] moduleBodies = new RequestedModuleBody[]
@@ -39,7 +41,7 @@ namespace test.Controller
         {
             await SuccesfulCreateModule();
 
-            ModuleController controller = new ModuleController();
+            ModuleController controller = new ModuleController(new AppDbContext(new DbContextOptions<AppDbContext>()));
             int responseStatusCode = (int)HttpStatusCode.NoContent;
 
             string lecternName = "Anatomy";

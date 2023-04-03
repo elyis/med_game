@@ -1,6 +1,8 @@
 ﻿using med_game.src.Controllers;
+using med_game.src.Data;
 using med_game.src.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Xunit;
 
@@ -11,7 +13,7 @@ namespace test.Controller
         [Fact]
         public async Task SuccessfulCreateLectern()
         {
-            LecternController lecternController = new LecternController();
+            LecternController lecternController = new LecternController(new AppDbContext(new DbContextOptions<AppDbContext>()));
 
             int[] validStatusCodes = new int[]
             {
@@ -60,7 +62,7 @@ namespace test.Controller
         {
             await SuccessfulCreateLectern();
 
-            LecternController lecternController = new LecternController();
+            LecternController lecternController = new LecternController(new AppDbContext(new DbContextOptions<AppDbContext>()));
             int responseStatusCode = (int) HttpStatusCode.NoContent;
 
             string[] removedLecterns = new string[]
@@ -86,7 +88,7 @@ namespace test.Controller
         [Fact]
         public async Task RemoveLecternIfNotExist()
         {
-            LecternController lecternController = new LecternController();
+            LecternController lecternController = new LecternController(new AppDbContext(new DbContextOptions<AppDbContext>()));
             int responseStatusCode = (int)HttpStatusCode.NoContent;
 
             int[] validStatusCodes = new int[]

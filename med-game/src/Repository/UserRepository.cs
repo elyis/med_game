@@ -101,15 +101,6 @@ namespace med_game.src.Repository
             return true;
         }
 
-        public async Task<User?> LoginAsync(Login login)
-            => await _context.Users
-            .FirstOrDefaultAsync
-            (
-                u => u.Email == login.Mail
-                &&
-                u.Password == login.Password
-            );
-
         public Task AddAchievementToEveryone(Achievement achievement)
         {
             var users = _context.Users;

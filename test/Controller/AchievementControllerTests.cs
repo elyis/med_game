@@ -1,6 +1,8 @@
 ﻿using med_game.src.Controllers;
+using med_game.src.Data;
 using med_game.src.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Security.Cryptography.Xml;
 using Xunit;
@@ -12,7 +14,7 @@ namespace test.Controller
         [Fact]
         public async Task SuccessfulCreateAchievement()
         {
-            AchievementController controller = new AchievementController();
+            AchievementController controller = new AchievementController(new AppDbContext(new DbContextOptions<AppDbContext>()));
             AchievementBody achievementBody = new AchievementBody
             {
                 Name = "Победитель",
@@ -36,7 +38,7 @@ namespace test.Controller
         [Fact]
         public async Task SuccesfulRemoveAchievement()
         {
-            AchievementController controller = new AchievementController();
+            AchievementController controller = new AchievementController(new AppDbContext(new DbContextOptions<AppDbContext>()));
             int responseStatusCode = (int)HttpStatusCode.NoContent;
 
             string[] removedAchievementNames = new string[]
@@ -62,7 +64,7 @@ namespace test.Controller
         [Fact]
         public async Task RemoveAchievementIfNotExist()
         {
-            AchievementController controller = new AchievementController();
+            AchievementController controller = new AchievementController(new AppDbContext(new DbContextOptions<AppDbContext>()));
             int responseStatusCode = (int)HttpStatusCode.NoContent;
 
             int[] validStatusCodes = new int[]

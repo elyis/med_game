@@ -110,7 +110,7 @@ class GameLobbyDistributorTesting
             await _authControllers[registationBody.index].SignUp(registationBody.value);
             var result = await _authControllers[registationBody.index].SignIn(_logins[registationBody.index]) as ObjectResult;
             TokenPair tokenPair = result.Value as TokenPair;
-            _accessTokens.Add(tokenPair.Access_token);
+            _accessTokens.Add(tokenPair.access_token);
         }
     }
 

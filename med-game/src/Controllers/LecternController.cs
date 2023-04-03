@@ -11,7 +11,7 @@ using System.Net;
 
 namespace med_game.src.Controllers
 {
-    [Route("api/lectern")]
+    [Route("lectern")]
     [ApiController]
     public class LecternController : ControllerBase
     {

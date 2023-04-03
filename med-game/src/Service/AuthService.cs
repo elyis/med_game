@@ -21,12 +21,8 @@ namespace med_game.src.Service
 
 
 
-        public async Task<TokenPair?> LoginAsync(Login login)
+        public async Task<TokenPair?> LoginAsync(User user)
         {
-            var user = await _userRepository.LoginAsync(login);
-            if (user == null)
-                return null;
-
             List<Claim> claims = new List<Claim>
             {
                 new Claim("UserId", user.Id.ToString()),
@@ -34,7 +30,7 @@ namespace med_game.src.Service
             };
 
             TokenPair tokenPair = _jwtManager.GenerateTokenPair(claims);
-            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.Refresh_token);
+            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.refresh_token);
 
             bool isUpdateToken = await _userRepository.UpdateTokenAsync(hashRefreshToken, user.Email );
             return isUpdateToken ? tokenPair : null;
@@ -56,7 +52,7 @@ namespace med_game.src.Service
             };
 
             TokenPair tokenPair = _jwtManager.GenerateTokenPair(claims);
-            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.Refresh_token);
+            string hashRefreshToken = _jwtManager.ComputeRefreshHashToken(tokenPair.refresh_token);
 
             bool isUpdateToken = await _userRepository.UpdateTokenAsync(hashRefreshToken, user.Mail);
             return isUpdateToken ? tokenPair : null;
@@ -83,7 +79,7 @@ namespace med_game.src.Service
                 );
 
             if (user.TokenValidBefore < DateTime.UtcNow)
-                tokenPair.Refresh_token = _jwtManager.GenerateRefreshToken();
+                tokenPair.refresh_token = _jwtManager.GenerateRefreshToken();
 
             return tokenPair;
         }

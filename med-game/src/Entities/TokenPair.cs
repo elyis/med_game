@@ -5,11 +5,11 @@ namespace med_game.src.Entities
     {
         public TokenPair(string accessToken, string refreshToken)
         {
-            Access_token = "Bearer " + accessToken;
-            Refresh_token = refreshToken;
+            access_token = "Bearer " + accessToken;
+            refresh_token = refreshToken;
         }
 
-        public string Access_token { get; set; }
-        public string Refresh_token { get; set; }
+        public string access_token { get; set; }
+        public string refresh_token { get; set; }
     }
 }

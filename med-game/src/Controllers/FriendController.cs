@@ -11,7 +11,7 @@ using System.Net;
 namespace med_game.src.Controllers
 {
     [ApiController]
-    [Route("api")]
+    [Route("")]
     public class FriendController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
