@@ -549,6 +549,44 @@ namespace med_game.src.Repository
                 user.Rating = 0;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<FriendInfo?> GetFriendInfo(long id, long friendId)
+        {
+            var user = await GetAsync(id);
+            var friend = await GetAsync(friendId);
+            if (user == null || friend == null)
+                return null;
+
+            FriendInfo friendInfo;
+            if (user.FriendsAcceptedByMe.FirstOrDefault(e => e.UserId == friend.Id) != default)
+                friendInfo = friend.ToFriendInfo(FriendStatus.Friend);
+            else if (user.FriendsAcceptedMe.FirstOrDefault(e => e.FriendId == friend.Id) != default)
+                friendInfo = friend.ToFriendInfo(FriendStatus.Friend);
+            else if (user.FriendRequestToMe.FirstOrDefault(e => e.SubscriberId == friend.Id) != default)
+                friendInfo = friend.ToFriendInfo(FriendStatus.Subscriber);
+            else
+                friendInfo = friend.ToFriendInfo(FriendStatus.ApplicationSent);
+
+            var ratingTable = _context.Users
+                .OrderByDescending(u => u.Rating)
+                .Select(u => new
+            {
+                u.Email,
+                u.Rating
+            }).ToList();
+
+            var placeInRating = 1;
+            foreach(var player in ratingTable)
+            {
+                if (player.Email == friendInfo.Email)
+                {
+                    friendInfo.PlaceInRatingDepartment = placeInRating;
+                    break;
+                }
+                placeInRating++;
+            }
+            return friendInfo;
+        }
     }
 
 

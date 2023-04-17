@@ -15,7 +15,7 @@ namespace med_game.src.Entities.Request
         public int NumOfPointsPerAnswer { get; set; } = 3;
 
         public AnswerOption RightAnswer { get; set; }
-        public List<AnswerOption> ListOfAnswers { get; set; }
+        public List<AnswerOption> ListOfAnswer { get; set; }
 
         public QuestionBody ToQuestionBody()
             => new QuestionBody 
@@ -27,7 +27,7 @@ namespace med_game.src.Entities.Request
                 timeSeconds = TimeSeconds,
                 rightAnswer = RightAnswer, 
                 numOfPointsPerAnswer = NumOfPointsPerAnswer, 
-                answers = ListOfAnswers 
+                answers = ListOfAnswer 
             };
 
         public QuestionProperties ToQuestionProperties()

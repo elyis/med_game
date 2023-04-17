@@ -30,17 +30,14 @@ namespace med_game.src.Service
             _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, string? enemyEmail = null)
         {
             if (context.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-
                 string? userIdClaim = _jwtUtilities.GetClaimUserId(context.Request.Headers.Authorization!);
                 if (!long.TryParse(userIdClaim, out long userId))
                     return;
-
-
 
                 try
                 {
@@ -48,17 +45,15 @@ namespace med_game.src.Service
                     Lectern? lectern = await _lecternRepository.GetAsync(roomSettingBody.LecternName);
                     Module? module = null;
 
-
-
                     if (roomSettingBody.ModuleName != null)
                         module = await _moduleRepository.GetAsync(roomSettingBody.LecternName, roomSettingBody.ModuleName);
-
 
                     if ((roomSettingBody.ModuleName != null && module == null) || lectern == null)
                     {
                         await webSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Module or lecture does not exist", CancellationToken.None);
                         return;
                     }
+
 
                     var roomSettings = new RoomSettings
                     {
@@ -67,28 +62,54 @@ namespace med_game.src.Service
                         Type = roomSettingBody.Type, 
                         CountPlayers = roomSettingBody.CountPlayers,
                     };
-
-                    var connection = new Connection
-                    {
-                        WebSocket = webSocket,
-                        RoomSettings = roomSettings
-                    };
-
                     string? roomId = null;
-                    if (!GameLobbyDistributorManager.AddConnection(userId, connection))
-                        return;
 
-                    byte[] buffer = new byte[512];
-
-                    
-                    Task<WebSocketReceiveResult> task = webSocket.ReceiveAsync(buffer, CancellationToken.None);
-                    while (webSocket.State == WebSocketState.Open && roomId == null)
+                    if (enemyEmail == null)
                     {
-                        if (task.IsCompletedSuccessfully && task.Result.MessageType == WebSocketMessageType.Close)
-                            await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Distributor accepted close frame", CancellationToken.None);
+                        var connection = new Connection
+                        {
+                            WebSocket = webSocket,
+                            RoomSettings = roomSettings
+                        };
 
-                        roomId = await GameLobbyDistributorManager.GetLobbyId(userId, roomSettings);
-                        await Task.Delay(2 * 1000);
+                        if (!GameLobbyDistributorManager.AddConnection(userId, connection))
+                            return;
+
+                        byte[] buffer = new byte[512];
+
+
+                        Task<WebSocketReceiveResult> task = webSocket.ReceiveAsync(buffer, CancellationToken.None);
+                        while (webSocket.State == WebSocketState.Open && roomId == null)
+                        {
+                            if (task.IsCompletedSuccessfully && task.Result.MessageType == WebSocketMessageType.Close)
+                                await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Distributor accepted close frame", CancellationToken.None);
+
+                            roomId = await GameLobbyDistributorManager.GetLobbyId(userId, roomSettings);
+                            await Task.Delay(2 * 1000);
+                        }
+                    }
+                    else
+                    {
+                        var connection = new ConnectionWithEnemy
+                        {
+                            RoomSettings = roomSettings,
+                            WebSocket = webSocket,
+                            EnemyEmail = enemyEmail,
+                        };
+
+                        if (!GameLobbyDistributorWithEnemyManager.AddConnection(userId, enemyEmail,connection))
+                            return;
+
+                        byte[] buffer = new byte[512];
+                        Task<WebSocketReceiveResult> task = webSocket.ReceiveAsync(buffer, CancellationToken.None);
+
+                        while (webSocket.State == WebSocketState.Open)
+                        {
+                            if (task.IsCompletedSuccessfully && task.Result.MessageType == WebSocketMessageType.Close)
+                                await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Distributor accepted close frame", CancellationToken.None);
+
+                            await Task.Delay(5  * 1000);
+                        }
                     }
                 }
 
@@ -110,6 +131,8 @@ namespace med_game.src.Service
                 finally
                 {
                     GameLobbyDistributorManager.RemoveConnection(userId);
+                    if(enemyEmail != null)
+                        GameLobbyDistributorWithEnemyManager.RemoveConnection(userId, enemyEmail);
                     if(webSocket.State == WebSocketState.Open)
                         await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
                 }
@@ -117,7 +140,6 @@ namespace med_game.src.Service
             else
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         }
-
         private static async Task<RoomSettingBody?> ReceiveRoomSettingJsonAsync(WebSocket webSocket)
         {
             byte[] buffer = new byte[2048];

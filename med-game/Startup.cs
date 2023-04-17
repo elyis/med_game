@@ -1,10 +1,8 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.OpenApi.Models;
-using med_game.src.Data;
-using Microsoft.AspNetCore.Identity;
-using med_game.src.Entities.Request;
+﻿using med_game.src.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace med_game
 {
@@ -35,7 +33,8 @@ namespace med_game
 
             services.AddAuthorization();
 
-            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            services.AddControllers().AddNewtonsoftJson()
+                .ConfigureApiBehaviorOptions(options =>
             {
                 options.SuppressMapClientErrors = true;
             });
@@ -74,13 +73,14 @@ namespace med_game
             app.UseAuthorization();
 
             app.UseStatusCodePages();
-            app.UseHttpsRedirection();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.MapControllers();
             app.UseWebSockets(new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromSeconds(5),
             });
-           
+
             app.Run();
         }
     }

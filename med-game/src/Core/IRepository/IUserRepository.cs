@@ -51,5 +51,6 @@ namespace med_game.src.Core.IRepository
         Task<User?> GetByToken(string refreshTokenHash);
         Rating GetRatingInfo();
         Task UpdateRating(long id, int countPoints);
+        Task<FriendInfo?> GetFriendInfo(long id, long friendId);
     }
 }

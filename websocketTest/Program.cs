@@ -1,7 +1,9 @@
 ﻿using med_game.src.Controllers;
+using med_game.src.Data;
 using med_game.src.Entities;
 using med_game.src.Entities.Request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -95,7 +97,8 @@ class GameLobbyDistributorTesting
                 Password = registrationBody.Password
             };
 
-            var authController = new AuthController(LoggerFactory.Create(builder => builder.AddConsole()));
+            var authController = new AuthController(LoggerFactory.Create(builder => builder.AddConsole()), 
+                                 new AppDbContext(new DbContextOptions<AppDbContext>()));
 
             _authControllers.Add(authController);
             _logins.Add(login);

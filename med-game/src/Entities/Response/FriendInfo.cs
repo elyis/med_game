@@ -11,6 +11,18 @@ namespace med_game.src.Entities.Response
         public Department Department { get; set; } = Department.Anatomy;
         public int PlaceInRatingDepartment { get; set; }
         public FriendStatus Status { get; set; }
+
+        public bool Equals(FriendInfo other)
+        {
+            if(Email == other.Email && Name == other.Name && Icon == other.Icon)
+                return true;
+            return false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as FriendInfo);
+        }
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

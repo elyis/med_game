@@ -14,7 +14,7 @@ namespace test.Controller
         public async Task SuccesfulCreateModule()
         {
             ModuleController controller = new ModuleController(new AppDbContext(new DbContextOptions<AppDbContext>()));
-            string lecternName = "Анатомия";
+            string lecternName = "Anatomy";
 
             RequestedModuleBody[] moduleBodies = new RequestedModuleBody[]
             {

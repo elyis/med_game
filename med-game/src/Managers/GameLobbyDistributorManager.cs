@@ -28,9 +28,10 @@ namespace med_game.src.Managers
                 if (Interlocked.CompareExchange(ref _connections[userId].IsEnemyFound, 1, 0) == 0)
                 {
                     var opponents = _connections.Where(
-                        connection => connection.Key != userId &&
-                        connection.Value.IsEnemyFound == 0 &&
-                        connection.Value.RoomSettings.Equals(roomSettings)
+                        connection => 
+                            connection.Key != userId &&
+                            connection.Value.IsEnemyFound == 0 &&
+                            connection.Value.RoomSettings.Equals(roomSettings)
                         )
                         .Take(roomSettings.CountPlayers - 1)
                         .ToArray();
@@ -40,7 +41,7 @@ namespace med_game.src.Managers
                         Interlocked.Exchange(ref _connections[userId].IsEnemyFound, 0);
                         Interlocked.Exchange(ref isLocked, 0);
                         return null;
-                    }
+                    } 
                     long[] playerIds = opponents.Select(p => p.Key).Append(userId).ToArray();
 
                     foreach (var opponent in opponents)

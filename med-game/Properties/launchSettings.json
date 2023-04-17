@@ -2,13 +2,13 @@
   "profiles": {
     "http_home": {
       "commandName": "Project",
-      "launchBrowser": false,
+      "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://192.168.1.165:5121"
+      "applicationUrl": "http://192.168.144.53:5121"
     },
 
     "http_lab": {
@@ -25,13 +25,13 @@
 
     "https": {
       "commandName": "Project",
-      "launchBrowser": false,
+      "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://192.168.100.65:7296;http://192.168.100.65:5121"
+      "applicationUrl": "http://192.168.144.53:5121"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -55,7 +55,7 @@
       "launchUrl": "https://localhost:7296/swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "https://localhost:7296;http://localhost:5121"
+        "ASPNETCORE_URLS": "https://localhost:7296;http://192.168.144.53:5121"
       },
       "distributionName": ""
     }

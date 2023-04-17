@@ -4,6 +4,7 @@ using med_game.src.models;
 using med_game.src.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
+using System.Net.WebSockets;
 
 namespace med_game.src.Data
 {
@@ -65,5 +66,6 @@ namespace med_game.src.Data
     public static class GlobalVariables
     {
         public static readonly ConcurrentDictionary<string, GamingLobby> GamingLobbies = new();
+        public static readonly ConcurrentDictionary<long, WebSocket> EnemyWebSocketSessions = new();
     }
 }

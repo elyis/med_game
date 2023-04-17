@@ -37,29 +37,32 @@ namespace med_game.src.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Module not found")]
         [SwaggerResponse((int)HttpStatusCode.Conflict)]
 
-        public async Task<IActionResult> CreateQuestion(RequestedQuestionBody questionBody)
+        public async Task<IActionResult> CreateQuestion(List<RequestedQuestionBody> questionBodies)
         {
-            Module? module = await _moduleRepository.GetAsync(questionBody.LecternName, questionBody.ModuleName);
-            if (module == null)
-                return NotFound();
+            foreach(var questionBody in questionBodies)
+            {
+                Module? module = await _moduleRepository.GetAsync(questionBody.LecternName, questionBody.ModuleName);
+                if (module == null)
+                    return NotFound();
 
-            QuestionProperties questionProperties = questionBody.ToQuestionProperties();
-            var questionIsExist = await _questionRepository.GetAsync(questionProperties, module);
-            if (questionIsExist != null)
-                return Conflict();
+                QuestionProperties questionProperties = questionBody.ToQuestionProperties();
+                var questionIsExist = await _questionRepository.GetAsync(questionProperties, module);
+                if (questionIsExist != null)
+                    continue;
 
-            if (questionBody.ListOfAnswers.FindIndex(q => q.Equals(questionBody.RightAnswer)) == -1)
-                return BadRequest();
+                if (questionBody.ListOfAnswer.FindIndex(q => q.Equals(questionBody.RightAnswer)) == -1)
+                    return BadRequest();
 
-            var answers = await _answerRepository.AddRange(questionBody.ListOfAnswers);
-            List<AnswerOption> answerList = answers.Select(answer => answer.ToAnswerOption()).ToList();
+                var answers = await _answerRepository.AddRange(questionBody.ListOfAnswer);
+                List<AnswerOption> answerList = answers.Select(answer => answer.ToAnswerOption()).ToList();
 
-            var rightAnswerIndex = answerList.FindIndex(q => q.Equals(questionBody.RightAnswer));
-            if (rightAnswerIndex == -1)
-                return BadRequest();
+                var rightAnswerIndex = answerList.FindIndex(q => q.Equals(questionBody.RightAnswer));
+                if (rightAnswerIndex == -1)
+                    return BadRequest();
 
-            var question = await _questionRepository.AddAsync(questionBody.ToQuestionBody(), module, answers.ToList(), rightAnswerIndex);
-            return question == null ? Conflict() : Ok();
+                var question = await _questionRepository.AddAsync(questionBody.ToQuestionBody(), module, answers.ToList(), rightAnswerIndex);
+            }
+            return Ok();
         }
 
 

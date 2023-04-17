@@ -37,7 +37,7 @@ namespace test.Controller
                     Description = null,
                     Image = null,
                     RightAnswer = new AnswerOption(TypeAnswer.Text, "Опорная, двигательная, защитная, биологическая", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption(TypeAnswer.Text, "Опорная, двигательная, защитная, биологическая", null),
                         new AnswerOption(TypeAnswer.Text, "Вместилище внутренних органов, депо минеральных веществ", null),
@@ -54,7 +54,7 @@ namespace test.Controller
                     Description = null,
                     Image = null,
                     RightAnswer = new AnswerOption(TypeAnswer.Text, "Органические и неорганический вещества", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption(TypeAnswer.Text, "Органические и неорганический вещества", null),
                         new AnswerOption(TypeAnswer.Text, "Белки, жиры, углеводы, соли кальция", null),
@@ -73,7 +73,7 @@ namespace test.Controller
                     Description = null,
                     Image = null,
                     RightAnswer = new AnswerOption(TypeAnswer.Text, "Большеберцовая кость", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption(TypeAnswer.Text, "Большеберцовая кость", null),
                         new AnswerOption(TypeAnswer.Text, "Малоберцовая кость", null),
@@ -91,7 +91,7 @@ namespace test.Controller
                     Description = "Что изображено под 6-ым пунктом?",
                     Image = "skeleton.jpg",
                     RightAnswer = new AnswerOption(TypeAnswer.Text, "Плечевая кость", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption(TypeAnswer.Text, "Большеберцовая кость", null),
                         new AnswerOption(TypeAnswer.Text, "Малоберцовая кость", null),
@@ -109,7 +109,7 @@ namespace test.Controller
                     Description = null,
                     Image = null,
                     RightAnswer = new AnswerOption(TypeAnswer.Input, "ушковидная поверхность крестца", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption(TypeAnswer.Input, "ушковидная поверхность крестца", null)
                     }
@@ -124,7 +124,7 @@ namespace test.Controller
                     Description = null,
                     Image = null,
                     RightAnswer = new AnswerOption(TypeAnswer.Text, "Мезодерма сомитов", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "Эктодерма", null),
@@ -150,7 +150,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "Одноперистая", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "Веретенообразная", null),
@@ -176,7 +176,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "Остистые отростки позвонков", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "Поперечные отростки позвонков", null),
@@ -202,7 +202,7 @@ namespace test.Controller
                     Image = "myology.jpeg",
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "pectoralis major", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "pectoralis major", null),
@@ -224,7 +224,7 @@ namespace test.Controller
                     Description = null,
                     Image = null,
                     RightAnswer = new AnswerOption(TypeAnswer.Image, null, "img_1.png"),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption(TypeAnswer.Image, null, "img_1.png"),
                         new AnswerOption
@@ -245,7 +245,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "labia oris", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "labia oris", null),
@@ -268,7 +268,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "6-7 лет", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "9-10 лет", null),
@@ -291,7 +291,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "желобовидные сосочки", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "нитевидные сосочки", null),
@@ -314,7 +314,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "20", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "24", null),
@@ -337,7 +337,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "Нейрон", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "Синапс", null),
@@ -363,7 +363,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "шейное", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "терминальное", null),
@@ -389,7 +389,7 @@ namespace test.Controller
                     Image = null,
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "8", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "5", null),
@@ -415,7 +415,7 @@ namespace test.Controller
                     Image = "img_1.png",
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "Центральная нервная система", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "Центральная нервная система", null),
@@ -435,7 +435,7 @@ namespace test.Controller
                     Image = "img_2.png",
                     RightAnswer = new AnswerOption
                         (TypeAnswer.Text, "Периферическая нервная система", null),
-                    ListOfAnswers = new List<AnswerOption>
+                    ListOfAnswer = new List<AnswerOption>
                     {
                         new AnswerOption
                         (TypeAnswer.Text, "Центральная нервная система", null),

@@ -19,7 +19,6 @@ namespace med_game.src.Controllers
 
 
         [HttpPost("answerIcon")]
-        [Authorize]
         [SwaggerOperation(Summary = "Upload answer icon to server")]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.UnsupportedMediaType, "All formats are supported 'image/'")]
@@ -39,7 +38,6 @@ namespace med_game.src.Controllers
 
 
         [HttpPost("questionIcon")]
-        [Authorize]
         [SwaggerOperation(Summary = "Upload question icon to server")]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(string))]
         [SwaggerResponse((int)HttpStatusCode.UnsupportedMediaType, "All formats are supported 'image/'")]

@@ -32,7 +32,14 @@ namespace med_game.src.Controllers
         [Authorize]
         [SwaggerOperation(Summary = "Game search")]
 
-        public async Task Get()
+        public async Task GameSearch()
             => await _gameLobbyService.InvokeAsync(HttpContext);
+
+        [HttpGet("main/{email}")]
+        [Authorize]
+        [SwaggerOperation(Summary = "Game search vs friend")]
+
+        public async Task FindGameAgainstFriend(string email)
+            => await _gameLobbyService.InvokeAsync(HttpContext, email);
     }
 }
