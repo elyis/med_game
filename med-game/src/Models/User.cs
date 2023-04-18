@@ -24,11 +24,11 @@ namespace med_game.src.Models
         public string? TokenHash { get; set; }
         public DateTime? TokenValidBefore { get; set; }
 
+
         public List<Achievement> Achievements { get; set; } = new();
 
-
-        public List<Friends> FriendsAcceptedMe { get; set; } = new();
-        public List<Friends> FriendsAcceptedByMe { get; set; } = new();
+        public List<FriendRelation> FriendsAcceptedMe { get; set; } = new();
+        public List<FriendRelation> FriendsAcceptedByMe { get; set; } = new();
         public List<FriendRequest> FriendRequestToMe { get; set; } = new();
         public List<FriendRequest> FriendRequestFromMe { get; set; } = new();
 

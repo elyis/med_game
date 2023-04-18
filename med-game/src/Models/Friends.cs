@@ -2,7 +2,7 @@
 
 namespace med_game.src.models
 {
-    public class Friends
+    public class FriendRelation
     {
         public long UserId { get; set; }
         public long FriendId { get; set; }

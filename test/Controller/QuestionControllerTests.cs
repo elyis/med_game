@@ -404,54 +404,12 @@ namespace test.Controller
                         (TypeAnswer.Text, "12", null)
                     }
                 },
-                new RequestedQuestionBody
-                {
-                    LecternName = lecternName,
-                    ModuleName = "Центральная нервная система",
-                    TypeQuestion = TypeQuestion.Image,
-                    TimeSeconds = 56,
-                    Text = null,
-                    Description = "Какая представлена система?",
-                    Image = "img_1.png",
-                    RightAnswer = new AnswerOption
-                        (TypeAnswer.Text, "Центральная нервная система", null),
-                    ListOfAnswer = new List<AnswerOption>
-                    {
-                        new AnswerOption
-                        (TypeAnswer.Text, "Центральная нервная система", null),
-
-                        new AnswerOption
-                        (TypeAnswer.Text, "Периферическая нервная система", null),
-                    }
-                },
-                new RequestedQuestionBody
-                {
-                    LecternName = lecternName,
-                    ModuleName = "Периферическая нервная система",
-                    TypeQuestion = TypeQuestion.Image,
-                    TimeSeconds = 56,
-                    Text = null,
-                    Description = "Какая представлена система?",
-                    Image = "img_2.png",
-                    RightAnswer = new AnswerOption
-                        (TypeAnswer.Text, "Периферическая нервная система", null),
-                    ListOfAnswer = new List<AnswerOption>
-                    {
-                        new AnswerOption
-                        (TypeAnswer.Text, "Центральная нервная система", null),
-
-                        new AnswerOption
-                        (TypeAnswer.Text, "Периферическая нервная система", null),
-                    }
-                },
             };
 
-            foreach(var body in bodies)
-            {
-                var result = await controller.CreateQuestion(body);
-                var code = result as StatusCodeResult;
-                responces.Add(code);
-            }
+            var result = await controller.CreateQuestion(bodies);
+            var code = result as StatusCodeResult;
+            responces.Add(code);
+            
 
             foreach(var response in responces)
             {

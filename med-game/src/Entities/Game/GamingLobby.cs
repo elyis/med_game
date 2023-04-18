@@ -41,7 +41,7 @@ namespace med_game.src.Entities.Game
         public ConcurrentDictionary<long, GameSession> Players { get; private set; } = new();
         private List<Question> Questions { get; set; }
 
-        public GamingLobby(RoomSettings roomSettings, ILogger logger, int countQuestions = 3)
+        public GamingLobby(RoomSettings roomSettings, ILogger logger, int countQuestions = 2)
         {
             RoomSettings = roomSettings;
             CountQuestions = countQuestions;
@@ -140,16 +140,16 @@ namespace med_game.src.Entities.Game
             }
             finally
             {
-                RemovePlayer(userId);
-                if (Players.Count - 1 <= 1 && Interlocked.CompareExchange(ref isResultSent, 1, 0) == 0)
+                if (Interlocked.CompareExchange(ref isResultSent, 1, 0) == 0)
                 {
                     string winner = await GetWinner();
                     await SendStateGameToEveryone(winner);
                     isLobbyRunning = 0;
                 }
                 else
-                    await Task.Delay(500);
+                    await Task.Delay(1000);
 
+                RemovePlayer(userId);
                 if (Players.Count <= 1)
                     GlobalVariables.GamingLobbies.Remove(Id, out _);
             }
@@ -195,7 +195,7 @@ namespace med_game.src.Entities.Game
             else
             {
                 await SendStateGameToEveryone(null);
-                await Task.Delay(2000);
+                await Task.Delay(2100);
                 await SendQuestionToEveryone();
 
                 foreach (var player in Players)
@@ -321,8 +321,7 @@ namespace med_game.src.Entities.Game
 
 
             var losers = Players.Where(player =>
-                    !winners.Contains(player) &&
-                    player.Value.WebSocket.State != WebSocketState.Aborted
+                    !winners.Contains(player)
             );
 
 
@@ -330,8 +329,17 @@ namespace med_game.src.Entities.Game
             {
                 if(!losers.Any())
                 {
-                    foreach (var player in winners)
-                        await _userRepository.UpdateRating(player.Key, countPointsForWin / 2);
+                    if(Players.Count == 2)
+                    {
+                        foreach (var player in winners)
+                            await _userRepository.UpdateRating(player.Key, countPointsForWin / 2);
+                    }
+                    else
+                    {
+                        foreach (var player in winners)
+                            await _userRepository.UpdateRating(player.Key, countPointsForWin);
+                    }
+                        
                 }
                 else
                 {

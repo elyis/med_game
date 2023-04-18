@@ -69,20 +69,16 @@ namespace med_game.src.Controllers
         [SwaggerOperation(Summary = "Get a list of friends, followings and subscribers")]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<FriendInfo>))]
 
-        public async Task GetFriendsAndSubscribers()
+        public async Task<IActionResult> GetFriendsAndSubscribers()
         {
             string token = Request.Headers.Authorization!;
             string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
 
             if (!long.TryParse(userIdClaim, out long userId))
-            {
-                Response.StatusCode = 401;
-                return;
-            }
+                return Unauthorized();
 
             var result = await _userRepository.GetFriendsAndSubscibersInfo(userId);
-            await Response.WriteAsJsonAsync(result);
+            return Ok(result.ToList());
         }
-
     }
 }

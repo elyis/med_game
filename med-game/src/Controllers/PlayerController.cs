@@ -46,7 +46,7 @@ namespace med_game.src.Controllers
                 return Unauthorized();
 
             var result = await _userRepository.GetUsers(userId, pattern);
-            return Ok(result);
+            return Ok(result.ToList());
         }
 
 

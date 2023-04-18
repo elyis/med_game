@@ -35,26 +35,20 @@ namespace med_game.src.Controllers
 
         public async Task<IActionResult> UploadProfileIcon()
         {
-            string? contentType = Request.Headers.ContentType;
-            if (contentType?.StartsWith("image/") == true)
-            {
-                string token = Request.Headers.Authorization!;
-                string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
+            string token = Request.Headers.Authorization!;
+            string? userIdClaim = _jwtUtilities.GetClaimUserId(token);
 
-                if (!long.TryParse(userIdClaim, out long userId))
-                    return Unauthorized();
+            if (!long.TryParse(userIdClaim, out long userId))
+                return Unauthorized();
 
-                var filename = await _fileUploader.UploadImage(Constants.pathToProfileIcons, Request.Body);
-                if (filename == null)
-                    return BadRequest();
+            var filename = await _fileUploader.UploadImage(Constants.pathToProfileIcons, Request.Body);
+            if (filename == null)
+                return BadRequest();
 
-                var isUpdate = await _userRepository.UpdateImageAsync(userId, filename);
-                if (!isUpdate)
-                    return Unauthorized();
-                return Ok(filename);
-            }
-
-            return new UnsupportedMediaTypeResult();
+            var isUpdate = await _userRepository.UpdateImageAsync(userId, filename);
+            if (!isUpdate)
+                return Unauthorized();
+            return Ok(filename);
         }
 
 

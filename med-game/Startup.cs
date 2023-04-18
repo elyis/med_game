@@ -1,5 +1,4 @@
 ﻿using med_game.src.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -19,7 +18,7 @@ namespace med_game
             var jwtSettings = Configuration.GetSection("JwtSettings");
             string secretKey = jwtSettings.GetValue<string>("Key")!;
 
-            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(Configuration["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<AppDbContext>();
             services.AddAuthentication("Bearer")
                 .AddJwtBearer(
                     options => options.TokenValidationParameters = new TokenValidationParameters

@@ -10,7 +10,9 @@ namespace med_game.src.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { 
+            Database.EnsureCreated();
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Achievement> Achievements { get; set; }
@@ -25,13 +27,14 @@ namespace med_game.src.Data
             var connectionString = config.GetConnectionString("DefaultConnection");
             optionsBuilder.UseNpgsql(connectionString);
             optionsBuilder.EnableSensitiveDataLogging();
+            base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Friends>(f =>
+            modelBuilder.Entity<FriendRelation>(f =>
             {
                 f.HasKey(f => new { f.UserId, f.FriendId });
 

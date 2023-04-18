@@ -258,10 +258,12 @@ namespace med_game.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("Rating", "Nickname");
+
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("med_game.src.models.Friends", b =>
+            modelBuilder.Entity("med_game.src.models.FriendRelation", b =>
                 {
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -273,7 +275,7 @@ namespace med_game.Migrations
 
                     b.HasIndex("FriendId");
 
-                    b.ToTable("Friends");
+                    b.ToTable("FriendRelation");
                 });
 
             modelBuilder.Entity("AchievementUser", b =>
@@ -347,16 +349,16 @@ namespace med_game.Migrations
                     b.Navigation("Module");
                 });
 
-            modelBuilder.Entity("med_game.src.models.Friends", b =>
+            modelBuilder.Entity("med_game.src.models.FriendRelation", b =>
                 {
                     b.HasOne("med_game.src.Models.User", "Friend")
-                        .WithMany("FriendsAcceptedByMe")
+                        .WithMany("FriendsAcceptedMe")
                         .HasForeignKey("FriendId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("med_game.src.Models.User", "User")
-                        .WithMany("FriendsAcceptedMe")
+                        .WithMany("FriendsAcceptedByMe")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();

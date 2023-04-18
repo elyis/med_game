@@ -32,7 +32,7 @@ namespace med_game.src.Core.IRepository
         Task<bool> IsSameUsersAsync(long id, string email);
 
         Task<bool> AddFriend(long id, string subscriberEmail);
-        Task<Friends?> GetFriendAsync(long id, string friendEmail);
+        Task<FriendRelation?> GetFriendAsync(long id, string friendEmail);
         Task<bool> RemoveFriend(long id, string friendEmail);
 
         Task<User?> GetFriendsAsync(long id);

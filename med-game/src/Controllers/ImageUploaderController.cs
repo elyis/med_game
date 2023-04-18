@@ -25,14 +25,8 @@ namespace med_game.src.Controllers
 
         public async Task<IActionResult> UploadAnswerIcon()
         {
-            string? contentType = Request.Headers.ContentType;
-            if (contentType?.StartsWith("image/") == true)
-            {
-                string? filename = await _fileUploader.UploadImage(Constants.pathToAnswerIcons, Request.Body);
-                return filename == null ? BadRequest() : Ok(filename);
-            }
-
-            return new UnsupportedMediaTypeResult();
+            string? filename = await _fileUploader.UploadImage(Constants.pathToAnswerIcons, Request.Body);
+            return filename == null ? BadRequest() : Ok(filename);
         }
 
 
@@ -44,14 +38,8 @@ namespace med_game.src.Controllers
 
         public async Task<IActionResult> UploadQuestionIcon()
         {
-            string? contentType = Request.Headers.ContentType;
-            if (contentType?.StartsWith("image/") == true)
-            {
-                string? filename = await _fileUploader.UploadImage(Constants.pathToQuestionIcons, Request.Body);
-                return filename == null ? BadRequest() : Ok(filename);
-            }
-
-            return new UnsupportedMediaTypeResult();
+            string? filename = await _fileUploader.UploadImage(Constants.pathToQuestionIcons, Request.Body);
+            return filename == null ? BadRequest() : Ok(filename);
         }
 
 
@@ -64,14 +52,8 @@ namespace med_game.src.Controllers
 
         public async Task<IActionResult> UploadAchievementIcon()
         {
-            string? contentType = Request.Headers.ContentType;
-            if (contentType?.StartsWith("image/") == true)
-            {
-                string? filename = await _fileUploader.UploadImage(Constants.pathToAchievementIcons, Request.Body);
-                return filename == null ? BadRequest() : Ok(filename);
-            }
-
-            return new UnsupportedMediaTypeResult();
+            string? filename = await _fileUploader.UploadImage(Constants.pathToAchievementIcons, Request.Body);
+            return filename == null ? BadRequest() : Ok(filename);
         }
 
 

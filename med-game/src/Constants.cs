@@ -1,20 +1,20 @@
 ﻿namespace med_game.src
 {
-    public class Constants
+    public static class Constants
     {
-        private const string server_url = "http://192.168.144.53:5121/";
+        private static readonly string server_url = Environment.GetEnvironmentVariable("ASPNETCORE_URLS")!.Split(";").First() + "/";
 
         //local photo storage 
-        public const string pathToIcons = @"src\Resources\Storages\";
-        public const string pathToAnswerIcons = $@"{pathToIcons}AnswerIcons\";
-        public const string pathToQuestionIcons = $@"{pathToIcons}QuestionIcons\";
-        public const string pathToAchievementIcons = $@"{pathToIcons}AchievementIcons\";
-        public const string pathToProfileIcons = $@"{pathToIcons}ProfileIcons\";
+        public static readonly string pathToIcons = @"src\Resources\Storages\";
+        public static readonly string pathToAnswerIcons = $@"{pathToIcons}AnswerIcons\";
+        public static readonly string pathToQuestionIcons = $@"{pathToIcons}QuestionIcons\";
+        public static readonly string pathToAchievementIcons = $@"{pathToIcons}AchievementIcons\";
+        public static readonly string pathToProfileIcons = $@"{pathToIcons}ProfileIcons\";
 
         //web path to photo
-        public const string webPathToAnswerIcons = $@"{server_url}answerIcon/";
-        public const string webPathToAchievementIcons = $@"{server_url}achievementIcon/";
-        public const string webPathToQuestionIcons = $@"{server_url}questionIcon/";
-        public const string webPathToProfileIcons = $@"{server_url}profileIcon/";
+        public static readonly string webPathToAnswerIcons = $@"{server_url}answerIcon/";
+        public static readonly string webPathToAchievementIcons = $@"{server_url}achievementIcon/";
+        public static readonly string webPathToQuestionIcons = $@"{server_url}questionIcon/";
+        public static readonly string webPathToProfileIcons = $@"{server_url}profileIcon/";
     }
 }

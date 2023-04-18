@@ -223,7 +223,7 @@ namespace med_game.src.Repository
             if(await IsSameUsersAsync(id, subscriberEmail)) 
                 return true;
 
-            Friends? friendRelation = await GetFriendAsync(id, subscriberEmail);
+            FriendRelation? friendRelation = await GetFriendAsync(id, subscriberEmail);
             if (friendRelation != null)
                 return true;
 
@@ -240,7 +240,7 @@ namespace med_game.src.Repository
                 if (friendRequest == null)
                     return false;
 
-                user.FriendsAcceptedByMe.Add(new Friends { Friend = friend });
+                user.FriendsAcceptedByMe.Add(new FriendRelation { Friend = friend });
                 _context.SaveChanges();
                 return true;
             }
@@ -248,18 +248,18 @@ namespace med_game.src.Repository
             return false;
         }
 
-        public async Task<Friends?> GetFriendAsync(long id, string friendEmail)
+        public async Task<FriendRelation?> GetFriendAsync(long id, string friendEmail)
         {
             User? user = await GetFriendsAsync(id);
             User? friend = await GetAsync(friendEmail);
             if (user == null || friend == null)
                 return null;
 
-            Friends? acceptedMe = user.FriendsAcceptedMe.FirstOrDefault(u => u.UserId == friend.Id && u.FriendId == user.Id);
+            FriendRelation? acceptedMe = user.FriendsAcceptedMe.FirstOrDefault(u => u.UserId == friend.Id && u.FriendId == user.Id);
             if(acceptedMe != null) 
                 return acceptedMe;
 
-            Friends? acceptedByMe = user.FriendsAcceptedByMe.FirstOrDefault(u => u.UserId == user.Id && u.FriendId == friend.Id);
+            FriendRelation? acceptedByMe = user.FriendsAcceptedByMe.FirstOrDefault(u => u.UserId == user.Id && u.FriendId == friend.Id);
             if(acceptedByMe != null) 
                 return acceptedByMe;
             return null;
@@ -268,7 +268,7 @@ namespace med_game.src.Repository
         //Удаление из друзей -> переход в подписчики
         public async Task<bool> RemoveFriend(long id, string friendEmail)
         {
-            Friends? friendRelation = await GetFriendAsync(id, friendEmail);
+            FriendRelation? friendRelation = await GetFriendAsync(id, friendEmail);
             if (friendRelation == null)
                 return false;
 
@@ -422,7 +422,7 @@ namespace med_game.src.Repository
                 {
                     foreach(var player in playersByRating)
                     {
-                        Friends? friendAcceptedMe = user.FriendsAcceptedMe.FirstOrDefault(u => u.UserId == player.Id);
+                        FriendRelation? friendAcceptedMe = user.FriendsAcceptedMe.FirstOrDefault(u => u.UserId == player.Id);
                         if(friendAcceptedMe != null)
                         {
                             UserInfo userInfo = friendAcceptedMe.User.ToUserInfo(UserStatus.Friend);
@@ -431,7 +431,7 @@ namespace med_game.src.Repository
                         }
 
 
-                        Friends? friendAcceptedByMe = user.FriendsAcceptedByMe.FirstOrDefault(u => u.FriendId == player.Id);
+                        FriendRelation? friendAcceptedByMe = user.FriendsAcceptedByMe.FirstOrDefault(u => u.FriendId == player.Id);
                         if (friendAcceptedByMe != null)
                         {
                             UserInfo userInfo = friendAcceptedByMe.Friend.ToUserInfo(UserStatus.Friend);
