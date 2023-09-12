@@ -1,0 +1,85 @@
+@page
+@model med_game.src.Pages.lectern
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Создать кафедру</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #141823;
+      margin: 0;
+      padding: 20px;
+      color: #fff;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background-color: #222;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+      color: #000;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* Media Queries */
+    @@media (max-width: 600px) {
+      .container {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Создать факультет</h1>
+    <form id="lecternForm" method="post" asp-action="OnPost" asp-antiforgery="true">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+      <label for="description">Description:</label>
+      <textarea id="description" name="description"></textarea>
+      
+      <button type="submit">Create</button>
+    </form>
+  </div>
+</body>
+</html>
